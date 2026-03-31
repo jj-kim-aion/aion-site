@@ -1,9 +1,53 @@
 "use client";
 
+import { useState } from "react";
 import { useReveal } from "@/lib/useReveal";
 import { PRODUCTS } from "@/lib/data";
 
+/** Map product IDs to their download API routes */
+const DOWNLOAD_ROUTES: Record<string, string> = {
+  "super-agent-playbook": "/api/download/super-agent-playbook",
+};
+
 function ProductCard({ product }: { product: (typeof PRODUCTS)[number] }) {
+  const [downloading, setDownloading] = useState(false);
+
+  const downloadRoute = DOWNLOAD_ROUTES[product.id];
+
+  async function handleDownload() {
+    if (!downloadRoute || downloading) return;
+
+    setDownloading(true);
+    try {
+      const res = await fetch(downloadRoute);
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error ?? `Download failed (${res.status})`);
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download =
+        res.headers.get("content-disposition")?.match(/filename="(.+)"/)?.[1] ??
+        `${product.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download error:", err);
+      alert(
+        err instanceof Error
+          ? err.message
+          : "Download failed. Please try again."
+      );
+    } finally {
+      setDownloading(false);
+    }
+  }
   const categoryLabels: Record<string, string> = {
     playbook: "Playbook",
     config: "Configuration",
@@ -88,8 +132,16 @@ function ProductCard({ product }: { product: (typeof PRODUCTS)[number] }) {
               </span>
             )}
           </div>
-          <button className="btn-primary text-[0.75rem] py-3 px-6">
-            <span>{product.cta}</span>
+          <button
+            className="btn-primary text-[0.75rem] py-3 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={downloading && !!downloadRoute}
+            onClick={downloadRoute ? handleDownload : undefined}
+          >
+            <span>
+              {downloading && downloadRoute
+                ? "Downloading…"
+                : product.cta}
+            </span>
           </button>
         </div>
       </div>
