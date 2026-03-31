@@ -1,0 +1,294 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════
+   AION LABS — Global Design System
+   Aesthetic: Architectural Futurism
+   Think: MOMA meets Zaha Hadid meets Stripe
+   ═══════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --void: #050505;
+  --obsidian: #0a0a0a;
+  --carbon: #111111;
+  --graphite: #1a1a1a;
+  --slate: #2a2a2a;
+  --ash: #8a8a8a;
+  --bone: #e8e4df;
+  --ivory: #f5f2ed;
+
+  --mirai-glow: #c9a84c;
+  --jj-glow: #7ec8e3;
+  --chelsea-glow: #d4956a;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ── BASE ─────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--void);
+  color: var(--bone);
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(201, 168, 76, 0.3);
+  color: var(--ivory);
+}
+
+/* ── GRAIN OVERLAY ────────────────────── */
+
+.grain-overlay::before {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  animation: grain 8s steps(10) infinite;
+  opacity: 0.4;
+}
+
+/* ── GRID LINES (architectural) ───────── */
+
+.arch-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+/* ── GLOW EFFECTS ─────────────────────── */
+
+.glow-mirai {
+  box-shadow: 0 0 80px -20px rgba(201, 168, 76, 0.15);
+}
+
+.glow-jj {
+  box-shadow: 0 0 80px -20px rgba(126, 200, 227, 0.15);
+}
+
+.glow-chelsea {
+  box-shadow: 0 0 80px -20px rgba(212, 149, 106, 0.15);
+}
+
+/* ── DIVIDERS ─────────────────────────── */
+
+.divider-thin {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+}
+
+.divider-glow {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mirai-glow), transparent);
+  opacity: 0.3;
+}
+
+/* ── SCROLLBAR ────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--slate);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ash);
+}
+
+/* ── CURSOR GLOW (desktop) ────────────── */
+
+@media (hover: hover) {
+  .cursor-glow {
+    position: relative;
+  }
+  .cursor-glow::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-out-expo);
+    background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(201, 168, 76, 0.06), transparent 40%);
+    pointer-events: none;
+  }
+  .cursor-glow:hover::after {
+    opacity: 1;
+  }
+}
+
+/* ── REVEAL ANIMATIONS ────────────────── */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s var(--ease-out-expo);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ── HOVER EFFECTS ────────────────────── */
+
+.hover-lift {
+  transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px -15px rgba(0,0,0,0.5);
+}
+
+/* ── PRODUCT CARDS ────────────────────── */
+
+.product-card {
+  background: linear-gradient(135deg, var(--graphite), var(--carbon));
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.5s var(--ease-out-expo);
+}
+
+.product-card:hover {
+  border-color: rgba(201, 168, 76, 0.2);
+  box-shadow: 0 0 60px -20px rgba(201, 168, 76, 0.1);
+}
+
+/* ── BUTTON STYLES ────────────────────── */
+
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: var(--graphite);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--ivory);
+  padding: 14px 32px;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.4s var(--ease-out-expo);
+  cursor: pointer;
+}
+
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--mirai-glow), var(--chelsea-glow));
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out-expo);
+}
+
+.btn-primary:hover {
+  border-color: rgba(201, 168, 76, 0.4);
+  color: white;
+}
+
+.btn-primary:hover::before {
+  opacity: 0.15;
+}
+
+.btn-primary span {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── AGENT ORBS ───────────────────────── */
+
+.agent-orb {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  filter: blur(40px);
+  animation: float 6s ease-in-out infinite;
+}
+
+.agent-orb-mirai {
+  background: radial-gradient(circle, var(--mirai-glow), transparent);
+}
+
+.agent-orb-jj {
+  background: radial-gradient(circle, var(--jj-glow), transparent);
+  animation-delay: -2s;
+}
+
+.agent-orb-chelsea {
+  background: radial-gradient(circle, var(--chelsea-glow), transparent);
+  animation-delay: -4s;
+}
+
+/* ── SECTION MARKERS ──────────────────── */
+
+.section-marker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+
+.section-marker::before {
+  content: "//";
+  margin-right: 0.5em;
+  color: var(--mirai-glow);
+}
+
+/* ── TYPOGRAPHY UTILITIES ─────────────── */
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--mirai-glow), #e8d5a0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-cool {
+  background: linear-gradient(135deg, var(--jj-glow), #b8dff0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-warm {
+  background: linear-gradient(135deg, var(--chelsea-glow), #e8c4a8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── RESPONSIVE ───────────────────────── */
+
+@layer utilities {
+  .px-edge {
+    padding-left: clamp(1.5rem, 5vw, 6rem);
+    padding-right: clamp(1.5rem, 5vw, 6rem);
+  }
+}
