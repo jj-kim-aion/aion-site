@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useReveal } from "@/lib/useReveal";
 import { PRODUCTS } from "@/lib/data";
+import { EmailModal } from "@/app/components/EmailModal";
 
 /** Map product IDs to their download API routes */
 const DOWNLOAD_ROUTES: Record<string, string> = {
@@ -10,43 +11,13 @@ const DOWNLOAD_ROUTES: Record<string, string> = {
 };
 
 function ProductCard({ product }: { product: (typeof PRODUCTS)[number] }) {
-  const [downloading, setDownloading] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   const downloadRoute = DOWNLOAD_ROUTES[product.id];
 
-  async function handleDownload() {
-    if (!downloadRoute || downloading) return;
-
-    setDownloading(true);
-    try {
-      const res = await fetch(downloadRoute);
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        throw new Error(body?.error ?? `Download failed (${res.status})`);
-      }
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download =
-        res.headers.get("content-disposition")?.match(/filename="(.+)"/)?.[1] ??
-        `${product.id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Download error:", err);
-      alert(
-        err instanceof Error
-          ? err.message
-          : "Download failed. Please try again."
-      );
-    } finally {
-      setDownloading(false);
-    }
+  function handleDownloadClick() {
+    if (!downloadRoute) return;
+    setShowEmailModal(true);
   }
   const categoryLabels: Record<string, string> = {
     playbook: "Playbook",
@@ -56,96 +27,103 @@ function ProductCard({ product }: { product: (typeof PRODUCTS)[number] }) {
   };
 
   return (
-    <div
-      id={product.id}
-      className="product-card rounded-architectural p-8 md:p-10 flex flex-col h-full group"
-    >
-      {/* Header */}
-      <div className="flex items-start justify-between mb-6">
-        <span className="font-mono text-caption text-ash uppercase">
-          {categoryLabels[product.category]}
-        </span>
-        {product.badge && (
-          <span className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/20 px-3 py-1 rounded-full">
-            {product.badge}
+    <>
+      <div
+        id={product.id}
+        className="product-card rounded-architectural p-8 md:p-10 flex flex-col h-full group"
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
+          <span className="font-mono text-caption text-ash uppercase">
+            {categoryLabels[product.category]}
           </span>
-        )}
-      </div>
-
-      {/* Title */}
-      <h3 className="text-display-sm font-light mb-4">{product.name}</h3>
-
-      {/* Description */}
-      <p className="text-body-sm text-ash leading-relaxed mb-8">
-        {product.description}
-      </p>
-
-      {/* Features */}
-      <div className="mb-8 flex-1">
-        <p className="font-mono text-caption text-ash/60 uppercase mb-3">
-          Includes
-        </p>
-        <div className="space-y-2">
-          {product.features.slice(0, 6).map((f, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <span className="text-mirai-glow/50 mt-1 text-xs">◆</span>
-              <span className="text-body-sm text-ash/80">{f}</span>
-            </div>
-          ))}
-          {product.features.length > 6 && (
-            <p className="text-body-sm text-ash/50 pl-5">
-              + {product.features.length - 6} more
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Deliverables */}
-      <div className="mb-8">
-        <p className="font-mono text-caption text-ash/60 uppercase mb-3">
-          You receive
-        </p>
-        <div className="space-y-1.5">
-          {product.deliverables.slice(0, 4).map((d, i) => (
-            <p key={i} className="text-body-sm text-ash/70">
-              → {d}
-            </p>
-          ))}
-          {product.deliverables.length > 4 && (
-            <p className="text-body-sm text-ash/50">
-              + {product.deliverables.length - 4} more items
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Price + CTA */}
-      <div className="border-t border-white/[0.04] pt-6 mt-auto">
-        <div className="flex items-end justify-between">
-          <div>
-            <span className="text-display-sm font-light text-bone">
-              ${product.price}
+          {product.badge && (
+            <span className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/20 px-3 py-1 rounded-full">
+              {product.badge}
             </span>
-            {product.originalPrice && (
-              <span className="text-body-sm text-ash/50 line-through ml-3">
-                ${product.originalPrice}
-              </span>
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-display-sm font-light mb-4">{product.name}</h3>
+
+        {/* Description */}
+        <p className="text-body-sm text-ash leading-relaxed mb-8">
+          {product.description}
+        </p>
+
+        {/* Features */}
+        <div className="mb-8 flex-1">
+          <p className="font-mono text-caption text-ash/60 uppercase mb-3">
+            Includes
+          </p>
+          <div className="space-y-2">
+            {product.features.slice(0, 6).map((f, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="text-mirai-glow/50 mt-1 text-xs">◆</span>
+                <span className="text-body-sm text-ash/80">{f}</span>
+              </div>
+            ))}
+            {product.features.length > 6 && (
+              <p className="text-body-sm text-ash/50 pl-5">
+                + {product.features.length - 6} more
+              </p>
             )}
           </div>
-          <button
-            className="btn-primary text-[0.75rem] py-3 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={downloading && !!downloadRoute}
-            onClick={downloadRoute ? handleDownload : undefined}
-          >
-            <span>
-              {downloading && downloadRoute
-                ? "Downloading…"
-                : product.cta}
-            </span>
-          </button>
+        </div>
+
+        {/* Deliverables */}
+        <div className="mb-8">
+          <p className="font-mono text-caption text-ash/60 uppercase mb-3">
+            You receive
+          </p>
+          <div className="space-y-1.5">
+            {product.deliverables.slice(0, 4).map((d, i) => (
+              <p key={i} className="text-body-sm text-ash/70">
+                → {d}
+              </p>
+            ))}
+            {product.deliverables.length > 4 && (
+              <p className="text-body-sm text-ash/50">
+                + {product.deliverables.length - 4} more items
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Price + CTA */}
+        <div className="border-t border-white/[0.04] pt-6 mt-auto">
+          <div className="flex items-end justify-between">
+            <div>
+              <span className="text-display-sm font-light text-bone">
+                ${product.price}
+              </span>
+              {product.originalPrice && (
+                <span className="text-body-sm text-ash/50 line-through ml-3">
+                  ${product.originalPrice}
+                </span>
+              )}
+            </div>
+            <button
+              className="btn-primary text-[0.75rem] py-3 px-6"
+              onClick={downloadRoute ? handleDownloadClick : undefined}
+            >
+              <span>{product.cta}</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Email Modal */}
+      {downloadRoute && (
+        <EmailModal
+          isOpen={showEmailModal}
+          onClose={() => setShowEmailModal(false)}
+          productId={product.id}
+          productName={product.name}
+        />
+      )}
+    </>
   );
 }
 

@@ -1,27 +1,49 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { validateAndConsumeToken } from "@/lib/tokens";
 
 const BLOB_URL =
   "https://idvgrnhe5bv9ai1w.public.blob.vercel-storage.com/1-eBook-Building-Super-Agents.md.pdf";
 
 const DOWNLOAD_FILENAME = "Building-Super-Agents-Playbook.pdf";
 
-export async function GET() {
-  // TODO: Add Stripe/LemonSqueezy payment verification here
-  // Example:
-  //   const session = await verifyPayment(request);
-  //   if (!session.paid) {
-  //     return NextResponse.json({ error: "Payment required" }, { status: 402 });
-  //   }
-  const isVerified = true; // Placeholder — always passes until payment is wired
-
-  if (!isVerified) {
-    return NextResponse.json(
-      { error: "Payment verification failed" },
-      { status: 402 }
-    );
-  }
-
+export async function GET(request: NextRequest) {
   try {
+    // Extract token from query params
+    const { searchParams } = new URL(request.url);
+    const token = searchParams.get("token");
+
+    // Validate token
+    if (!token) {
+      return NextResponse.json(
+        {
+          error: "Download link is invalid or missing",
+          message:
+            "Please request a new download link from the store page.",
+        },
+        { status: 401 }
+      );
+    }
+
+    // Validate and consume token (one-time use)
+    const tokenData = validateAndConsumeToken(token);
+
+    if (!tokenData) {
+      return NextResponse.json(
+        {
+          error: "Download link has expired or already been used",
+          message:
+            "Download links expire after 6 hours or after one use. Please request a new download link from the store page.",
+        },
+        { status: 401 }
+      );
+    }
+
+    // Log successful download for analytics
+    console.log(
+      `Download authorized | Email: ${tokenData.email} | Product: ${tokenData.productId} | Token consumed`
+    );
+
+    // Fetch PDF from blob storage
     const upstream = await fetch(BLOB_URL);
 
     if (!upstream.ok) {
@@ -29,17 +51,23 @@ export async function GET() {
         `Blob fetch failed: ${upstream.status} ${upstream.statusText}`
       );
       return NextResponse.json(
-        { error: "File temporarily unavailable" },
+        {
+          error: "File temporarily unavailable",
+          message:
+            "We're having trouble accessing the file. Please try again in a few minutes or contact support.",
+        },
         { status: 502 }
       );
     }
 
+    // Set response headers for download
     const headers = new Headers();
     headers.set(
       "Content-Disposition",
       `attachment; filename="${DOWNLOAD_FILENAME}"`
     );
     headers.set("Content-Type", "application/pdf");
+    headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
 
     // Forward content-length if upstream provides it
     const contentLength = upstream.headers.get("content-length");
@@ -55,7 +83,11 @@ export async function GET() {
   } catch (error) {
     console.error("Download route error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        message:
+          "Something went wrong on our end. Please try again or contact support.",
+      },
       { status: 500 }
     );
   }
