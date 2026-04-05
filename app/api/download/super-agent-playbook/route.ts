@@ -12,22 +12,55 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get("token");
 
-    // Validate token
+    // Validate token presence
     if (!token) {
+      console.log("⚠️ Download attempt with missing token");
       return NextResponse.json(
         {
           error: "Download link is invalid or missing",
-          message:
-            "Please request a new download link from the store page.",
+          message: "Please request a new download link from the store page.",
         },
         { status: 401 }
       );
     }
 
+    console.log(`🔍 Validating token: ${token.substring(0, 8)}...`);
+
+    // Check Redis connection availability
+    if (!process.env.REDIS_URL) {
+      console.error("❌ REDIS_URL environment variable not configured");
+      return NextResponse.json(
+        {
+          error: "Service configuration error",
+          message: "Token validation service is unavailable. Please contact support.",
+        },
+        { status: 500 }
+      );
+    }
+
     // Validate and consume token (one-time use)
-    const tokenData = validateAndConsumeToken(token);
+    let tokenData;
+    try {
+      tokenData = await validateAndConsumeToken(token);
+    } catch (validationError) {
+      console.error("❌ Token validation error:", validationError);
+      
+      // User-friendly error based on error type
+      const errorMessage = validationError instanceof Error && validationError.message.includes("Redis")
+        ? "Token validation service is temporarily unavailable. Please try again in a moment."
+        : "Token validation failed. Please request a new download link.";
+      
+      return NextResponse.json(
+        {
+          error: "Token validation failed",
+          message: errorMessage,
+        },
+        { status: 500 }
+      );
+    }
 
     if (!tokenData) {
+      console.log(`⚠️ Invalid or expired token: ${token.substring(0, 8)}...`);
       return NextResponse.json(
         {
           error: "Download link has expired or already been used",
@@ -40,25 +73,40 @@ export async function GET(request: NextRequest) {
 
     // Log successful download for analytics
     console.log(
-      `Download authorized | Email: ${tokenData.email} | Product: ${tokenData.productId} | Token consumed`
+      `✅ Download authorized | Email: ${tokenData.email} | Product: ${tokenData.productId} | Token consumed: ${token.substring(0, 8)}...`
     );
 
     // Fetch PDF from blob storage
-    const upstream = await fetch(BLOB_URL);
-
-    if (!upstream.ok) {
-      console.error(
-        `Blob fetch failed: ${upstream.status} ${upstream.statusText}`
-      );
+    console.log(`📥 Fetching PDF from blob storage...`);
+    
+    let upstream;
+    try {
+      upstream = await fetch(BLOB_URL);
+    } catch (fetchError) {
+      console.error("❌ Blob storage fetch error:", fetchError);
       return NextResponse.json(
         {
           error: "File temporarily unavailable",
-          message:
-            "We're having trouble accessing the file. Please try again in a few minutes or contact support.",
+          message: "Unable to retrieve the file. Please try again in a moment or contact support.",
         },
         { status: 502 }
       );
     }
+
+    if (!upstream.ok) {
+      console.error(
+        `❌ Blob fetch failed: ${upstream.status} ${upstream.statusText}`
+      );
+      return NextResponse.json(
+        {
+          error: "File temporarily unavailable",
+          message: "We're having trouble accessing the file. Please try again in a few minutes or contact support.",
+        },
+        { status: 502 }
+      );
+    }
+
+    console.log(`✅ PDF fetched successfully, streaming to client...`);
 
     // Set response headers for download
     const headers = new Headers();
@@ -68,6 +116,7 @@ export async function GET(request: NextRequest) {
     );
     headers.set("Content-Type", "application/pdf");
     headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    headers.set("X-Download-Email", tokenData.email); // For analytics
 
     // Forward content-length if upstream provides it
     const contentLength = upstream.headers.get("content-length");
@@ -80,13 +129,13 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers,
     });
+    
   } catch (error) {
-    console.error("Download route error:", error);
+    console.error("❌ Download route error:", error);
     return NextResponse.json(
       {
         error: "Internal server error",
-        message:
-          "Something went wrong on our end. Please try again or contact support.",
+        message: "Something went wrong on our end. Please try again or contact support.",
       },
       { status: 500 }
     );

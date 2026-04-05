@@ -47,8 +47,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate secure token
-    const token = createToken(email, productId);
+    // Check Redis connection availability
+    if (!process.env.REDIS_URL) {
+      console.error("❌ REDIS_URL environment variable not configured");
+      return NextResponse.json(
+        { error: "Service configuration error. Please contact support." },
+        { status: 500 }
+      );
+    }
+
+    // Generate secure token with Redis
+    let token: string;
+    try {
+      console.log(`📝 Creating token for ${email}...`);
+      token = await createToken(email, productId);
+      console.log(`✅ Token created successfully: ${token.substring(0, 8)}...`);
+    } catch (tokenError) {
+      console.error("❌ Token creation failed:", tokenError);
+      
+      // User-friendly error message
+      const errorMessage = tokenError instanceof Error && tokenError.message.includes("REDIS_URL")
+        ? "Token service is not configured. Please contact support."
+        : "Failed to generate download link. Please try again in a moment.";
+      
+      return NextResponse.json(
+        { error: errorMessage },
+        { status: 500 }
+      );
+    }
 
     // Build download URL
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
@@ -59,40 +85,63 @@ export async function POST(request: NextRequest) {
 
     // Send email via Resend
     try {
+      console.log(`📧 Sending download email to ${email}...`);
+      
       const { data, error } = await resend.emails.send({
-        from: "Aion Research <aion@aionresearch.io>",
+        from: "Aion Research <onboarding@resend.dev>", // Resend's verified test domain
         to: [email],
-        replyTo: "tech@aionresearch.io",
+        replyTo: "onboarding@resend.dev",
         subject: "Your Aion Super Agents Playbook Download",
         html: getDownloadEmailHTML(productName, downloadUrl, email),
         text: getDownloadEmailText(productName, downloadUrl, email),
       });
 
       if (error) {
-        console.error("Resend error:", error);
+        console.error("❌ Resend error:", JSON.stringify(error, null, 2));
+        
+        // Return detailed error for debugging
         return NextResponse.json(
-          { error: "Failed to send email. Please try again." },
+          { 
+            error: "Failed to send email", 
+            message: error.message || "Unknown Resend error",
+            details: error,
+            hint: "Check Resend dashboard for domain verification and API key permissions"
+          },
           { status: 500 }
         );
       }
 
-      console.log(`Download link sent to ${email} | Token: ${token} | Resend ID: ${data?.id}`);
+      console.log(`✅ Email sent successfully | Recipient: ${email} | Token: ${token.substring(0, 8)}... | Resend ID: ${data?.id}`);
 
+      // Return success response
       return NextResponse.json({
         success: true,
         message: "Download link sent to your email",
+        token, // Useful for testing
+        downloadUrl, // For direct testing
       });
+      
     } catch (emailError) {
-      console.error("Email sending error:", emailError);
+      console.error("❌ Email sending error:", emailError);
       return NextResponse.json(
         { error: "Failed to send email. Please check your email address and try again." },
         { status: 500 }
       );
     }
+    
   } catch (error) {
-    console.error("Request link error:", error);
+    console.error("❌ Request link error:", error);
+    
+    // Handle JSON parsing errors specifically
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: "Invalid request format" },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error. Please try again." },
       { status: 500 }
     );
   }
