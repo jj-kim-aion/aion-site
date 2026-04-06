@@ -10,15 +10,15 @@ const DOWNLOAD_ROUTES: Record<string, string> = {
   "super-agent-playbook": "/api/download/super-agent-playbook",
 };
 
-function ProductCard({ product }: { product: (typeof PRODUCTS)[number] }) {
-  const [showEmailModal, setShowEmailModal] = useState(false);
-
+function ProductCard({ 
+  product, 
+  onDownloadClick 
+}: { 
+  product: (typeof PRODUCTS)[number];
+  onDownloadClick: (product: (typeof PRODUCTS)[number]) => void;
+}) {
   const downloadRoute = DOWNLOAD_ROUTES[product.id];
 
-  function handleDownloadClick() {
-    if (!downloadRoute) return;
-    setShowEmailModal(true);
-  }
   const categoryLabels: Record<string, string> = {
     playbook: "Playbook",
     config: "Configuration",
@@ -108,23 +108,13 @@ function ProductCard({ product }: { product: (typeof PRODUCTS)[number] }) {
             </div>
             <button
               className="btn-primary text-[0.75rem] py-3 px-6"
-              onClick={downloadRoute ? handleDownloadClick : undefined}
+              onClick={downloadRoute ? () => onDownloadClick(product) : undefined}
             >
               <span>{product.cta}</span>
             </button>
           </div>
         </div>
       </div>
-
-      {/* Email Modal */}
-      {downloadRoute && (
-        <EmailModal
-          isOpen={showEmailModal}
-          onClose={() => setShowEmailModal(false)}
-          productId={product.id}
-          productName={product.name}
-        />
-      )}
     </>
   );
 }
@@ -134,6 +124,14 @@ export default function StorePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [activeSort, setActiveSort] = useState("default");
+
+  const [selectedProduct, setSelectedProduct] = useState<(typeof PRODUCTS)[number] | null>(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
+  function handleDownloadClick(product: (typeof PRODUCTS)[number]) {
+    setSelectedProduct(product);
+    setShowEmailModal(true);
+  }
 
   const sortedProducts = [...PRODUCTS].sort((a, b) => {
     if (activeSort === "price-asc") return a.price - b.price;
@@ -262,7 +260,7 @@ export default function StorePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts.map((p, i) => (
               <div key={p.id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
-                <ProductCard product={p} />
+                <ProductCard product={p} onDownloadClick={handleDownloadClick} />
               </div>
             ))}
           </div>
@@ -280,7 +278,7 @@ export default function StorePage() {
               </div>
               <div className="reveal reveal-delay-1">
                 {flagship.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <ProductCard key={p.id} product={p} onDownloadClick={handleDownloadClick} />
                 ))}
               </div>
             </section>
@@ -296,7 +294,7 @@ export default function StorePage() {
               <div className="grid md:grid-cols-2 gap-6">
                 {configs.map((p, i) => (
                   <div key={p.id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
-                    <ProductCard product={p} />
+                    <ProductCard product={p} onDownloadClick={handleDownloadClick} />
                   </div>
                 ))}
               </div>
@@ -313,7 +311,7 @@ export default function StorePage() {
               <div className="grid md:grid-cols-2 gap-6">
                 {toolkits.map((p, i) => (
                   <div key={p.id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
-                    <ProductCard product={p} />
+                    <ProductCard product={p} onDownloadClick={handleDownloadClick} />
                   </div>
                 ))}
               </div>
@@ -329,7 +327,7 @@ export default function StorePage() {
               </div>
               <div className="reveal reveal-delay-1 max-w-3xl">
                 {bundles.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <ProductCard key={p.id} product={p} onDownloadClick={handleDownloadClick} />
                 ))}
               </div>
             </section>
@@ -385,6 +383,16 @@ export default function StorePage() {
             ))}
           </div>
         </section>
+      )}
+
+      {/* Global Email Modal */}
+      {selectedProduct && (
+        <EmailModal
+          isOpen={showEmailModal}
+          onClose={() => setShowEmailModal(false)}
+          productId={selectedProduct.id}
+          productName={selectedProduct.name}
+        />
       )}
     </div>
   );
