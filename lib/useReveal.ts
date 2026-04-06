@@ -18,12 +18,31 @@ export function useReveal() {
     );
 
     const el = ref.current;
-    if (el) {
-      const reveals = el.querySelectorAll(".reveal");
-      reveals.forEach((r) => observer.observe(r));
-    }
+    if (!el) return;
 
-    return () => observer.disconnect();
+    const observeReveals = () => {
+      const reveals = el.querySelectorAll(".reveal:not(.visible)");
+      reveals.forEach((r) => observer.observe(r));
+    };
+
+    // Initial observation
+    observeReveals();
+
+    // Use MutationObserver to watch for newly added .reveal elements
+    const mutationObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0) {
+          observeReveals();
+        }
+      });
+    });
+
+    mutationObserver.observe(el, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+    };
   }, []);
 
   return ref;
