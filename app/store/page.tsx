@@ -10,15 +10,15 @@ const DOWNLOAD_ROUTES: Record<string, string> = {
   "super-agent-playbook": "/api/download/super-agent-playbook",
 };
 
-function ProductCard({ product }: { product: (typeof PRODUCTS)[number] }) {
-  const [showEmailModal, setShowEmailModal] = useState(false);
-
+function ProductCard({ 
+  product, 
+  onDownloadClick 
+}: { 
+  product: (typeof PRODUCTS)[number];
+  onDownloadClick: (product: (typeof PRODUCTS)[number]) => void;
+}) {
   const downloadRoute = DOWNLOAD_ROUTES[product.id];
 
-  function handleDownloadClick() {
-    if (!downloadRoute) return;
-    setShowEmailModal(true);
-  }
   const categoryLabels: Record<string, string> = {
     playbook: "Playbook",
     config: "Configuration",
@@ -30,8 +30,10 @@ function ProductCard({ product }: { product: (typeof PRODUCTS)[number] }) {
     <>
       <div
         id={product.id}
-        className="product-card rounded-architectural p-8 md:p-10 flex flex-col h-full group"
+        className="rounded-2xl bg-carbon p-8 md:p-10 flex flex-col h-full relative ring-1 ring-white/5 hover:bg-graphite hover:ring-white/10 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] group overflow-hidden"
       >
+        {/* Subtle glass effect gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none" />
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <span className="font-mono text-caption text-ash uppercase">
@@ -106,34 +108,52 @@ function ProductCard({ product }: { product: (typeof PRODUCTS)[number] }) {
             </div>
             <button
               className="btn-primary text-[0.75rem] py-3 px-6"
-              onClick={downloadRoute ? handleDownloadClick : undefined}
+              onClick={downloadRoute ? () => onDownloadClick(product) : undefined}
             >
               <span>{product.cta}</span>
             </button>
           </div>
         </div>
       </div>
-
-      {/* Email Modal */}
-      {downloadRoute && (
-        <EmailModal
-          isOpen={showEmailModal}
-          onClose={() => setShowEmailModal(false)}
-          productId={product.id}
-          productName={product.name}
-        />
-      )}
     </>
   );
 }
 
 export default function StorePage() {
   const revealRef = useReveal();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeSort, setActiveSort] = useState("default");
 
-  const flagship = PRODUCTS.filter((p) => p.category === "playbook");
-  const configs = PRODUCTS.filter((p) => p.category === "config");
-  const toolkits = PRODUCTS.filter((p) => p.category === "toolkit");
-  const bundles = PRODUCTS.filter((p) => p.category === "bundle");
+  const [selectedProduct, setSelectedProduct] = useState<(typeof PRODUCTS)[number] | null>(null);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
+  function handleDownloadClick(product: (typeof PRODUCTS)[number]) {
+    setSelectedProduct(product);
+    setShowEmailModal(true);
+  }
+
+  const sortedProducts = [...PRODUCTS].sort((a, b) => {
+    if (activeSort === "price-asc") return a.price - b.price;
+    if (activeSort === "price-desc") return b.price - a.price;
+    return 0;
+  });
+
+  const filteredProducts = sortedProducts.filter((p) => {
+    const query = searchQuery.toLowerCase();
+    const searchMatch = 
+      p.name.toLowerCase().includes(query);
+    
+    if (activeFilter === "all") return searchMatch;
+    return searchMatch && p.category === activeFilter;
+  });
+
+  const flagship = filteredProducts.filter((p) => p.category === "playbook");
+  const configs = filteredProducts.filter((p) => p.category === "config");
+  const toolkits = filteredProducts.filter((p) => p.category === "toolkit");
+  const bundles = filteredProducts.filter((p) => p.category === "bundle");
+  
+  const hasResults = filteredProducts.length > 0;
 
   return (
     <div ref={revealRef}>
@@ -155,108 +175,225 @@ export default function StorePage() {
         </div>
       </section>
 
-      {/* ── FLAGSHIP ──────────────────── */}
-      <section className="px-edge pb-section">
-        <div className="reveal mb-8">
-          <p className="section-marker mb-2">Flagship</p>
-        </div>
-        <div className="reveal reveal-delay-1">
-          {flagship.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
-
-      {/* ── CONFIGURATIONS ────────────── */}
-      <section className="px-edge pb-section">
-        <div className="divider-thin mb-16" />
-        <div className="reveal mb-8">
-          <p className="section-marker mb-2">Configurations</p>
-        </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          {configs.map((p, i) => (
-            <div key={p.id} className={`reveal reveal-delay-${i + 1}`}>
-              <ProductCard product={p} />
+      {/* ── SEARCH BAR (PINNED) ───────── */}
+      <div className="sticky top-0 z-50 px-edge py-6 bg-void/90 backdrop-blur-md border-b border-white/[0.04] shadow-[0_20px_50px_rgba(0,0,0,0.3)] mb-12 translate-y-[-1px]">
+        <div className="max-w-4xl mx-auto flex flex-col gap-5">
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-ash group-focus-within:text-mirai-glow transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── TOOLKITS ──────────────────── */}
-      <section className="px-edge pb-section">
-        <div className="divider-thin mb-16" />
-        <div className="reveal mb-8">
-          <p className="section-marker mb-2">Toolkits</p>
-        </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          {toolkits.map((p, i) => (
-            <div key={p.id} className={`reveal reveal-delay-${i + 1}`}>
-              <ProductCard product={p} />
+            <input
+              type="text"
+              placeholder="Search products, toolkits, playbooks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-carbon/50 hover:bg-carbon text-bone focus:outline-none ring-1 ring-white/10 focus:ring-mirai-glow/80 focus:bg-carbon pl-14 pr-6 py-4 rounded-xl transition-all font-body text-body-md shadow-inner"
+            />
+          </div>
+          
+          {/* Filters */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { id: "all", label: "All Products" },
+                { id: "playbook", label: "Playbooks" },
+                { id: "config", label: "Configurations" },
+                { id: "toolkit", label: "Toolkits" },
+                { id: "bundle", label: "Bundles" },
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setActiveFilter(f.id)}
+                  className={`px-5 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 ${
+                    activeFilter === f.id
+                      ? "bg-bone text-void shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                      : "bg-carbon/40 text-ash ring-1 ring-white/10 hover:bg-carbon hover:text-bone hover:ring-white/20"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* ── BUNDLE ────────────────────── */}
-      <section className="px-edge pb-section">
-        <div className="divider-glow mb-16" />
-        <div className="reveal mb-8">
-          <p className="section-marker mb-2">The Full System</p>
-        </div>
-        <div className="reveal reveal-delay-1 max-w-3xl">
-          {bundles.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
-
-      {/* ── FAQ ────────────────────────── */}
-      <section className="px-edge pb-section">
-        <div className="divider-thin mb-16" />
-        <div className="reveal mb-12">
-          <p className="section-marker mb-4">Questions</p>
-          <h2 className="text-display-md font-light">Before you buy</h2>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
-          {[
-            {
-              q: "What platform do I need?",
-              a: "All configs are built for OpenClaw, the open-source agent platform. You'll need a Mac, Linux machine, or cloud VPS (Azure recommended). The playbook covers full setup from scratch.",
-            },
-            {
-              q: "Are these the actual production configs?",
-              a: "Yes. Sanitized for security (API keys removed, personal data stripped), but structurally identical to what runs our live deployment.",
-            },
-            {
-              q: "Do I need coding experience?",
-              a: "You need to be comfortable editing config files and running terminal commands. The playbook is detailed enough for technical non-developers, but this isn't a no-code solution.",
-            },
-            {
-              q: "What models are required?",
-              a: "The system is designed for Anthropic Claude (Opus, Sonnet, Haiku) and OpenAI Codex. You'll need API keys from both providers. Model tiering keeps costs under $8/day at full scale.",
-            },
-            {
-              q: "Is there a refund policy?",
-              a: "Yes. If the configs don't work as documented within 14 days of purchase, we'll refund in full. Digital products — no questions asked.",
-            },
-            {
-              q: "Do you offer consulting?",
-              a: "Custom deployments and strategy sprints are available. Contact us through the site for scoping and pricing.",
-            },
-          ].map((faq, i) => (
-            <div
-              key={i}
-              className={`reveal reveal-delay-${(i % 4) + 1} border-t border-white/[0.06] pt-6`}
-            >
-              <h3 className="text-body-md font-medium text-bone mb-2">
-                {faq.q}
-              </h3>
-              <p className="text-body-sm text-ash leading-relaxed">{faq.a}</p>
+            <div className="flex items-center gap-3">
+              <span className="text-[0.65rem] font-mono uppercase tracking-widest text-ash/40">Sort:</span>
+              <select
+                value={activeSort}
+                onChange={(e) => setActiveSort(e.target.value)}
+                className="bg-carbon/40 text-ash text-xs font-mono uppercase tracking-wider px-3 py-2 rounded-lg ring-1 ring-white/10 focus:outline-none focus:ring-mirai-glow/50 appearance-none cursor-pointer hover:bg-carbon hover:text-bone transition-all"
+              >
+                <option value="default">Default</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+              </select>
             </div>
-          ))}
+          </div>
         </div>
-      </section>
+      </div>
+
+      {!hasResults && (
+        <section className="px-edge py-section flex flex-col items-center justify-center text-center">
+          <p className="text-body-lg text-ash mb-4">No assets match the criteria</p>
+          <button onClick={() => { setSearchQuery(""); setActiveFilter("all"); setActiveSort("default"); }} className="text-mirai-glow hover:text-mirai-soft underline underline-offset-4 text-sm font-mono tracking-wide">
+            Clear All Filters
+          </button>
+        </section>
+      )}
+
+      {/* ── SEARCH RESULTS (UNIFIED) ─────── */}
+      {(searchQuery || activeSort !== "default") && hasResults && (
+        <section className="px-edge pb-section">
+          <div className="reveal mb-8">
+            <p className="section-marker mb-2">
+              {searchQuery ? "Search Results" : "All Products"}
+            </p>
+            <p className="text-ash text-sm">
+              {searchQuery 
+                ? `Showing ${filteredProducts.length} items for "${searchQuery}"`
+                : `Showing ${filteredProducts.length} items sorted by ${activeSort.replace(/-/g, ' ')}`
+              }
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts.map((p, i) => (
+              <div key={p.id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
+                <ProductCard product={p} onDownloadClick={handleDownloadClick} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ── GROUPED VIEW (ONLY IF NO SEARCH AND NO SORT) ── */}
+      {!searchQuery && activeSort === "default" && (
+        <>
+          {/* ── FLAGSHIP ──────────────────── */}
+          {flagship.length > 0 && (
+            <section className="px-edge pb-section">
+              <div className="reveal mb-8">
+                <p className="section-marker mb-2">Flagship</p>
+              </div>
+              <div className="reveal reveal-delay-1">
+                {flagship.map((p) => (
+                  <ProductCard key={p.id} product={p} onDownloadClick={handleDownloadClick} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── CONFIGURATIONS ────────────── */}
+          {configs.length > 0 && (
+            <section className="px-edge pb-section">
+              {flagship.length > 0 && <div className="divider-thin mb-16" />}
+              <div className="reveal mb-8">
+                <p className="section-marker mb-2">Configurations</p>
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                {configs.map((p, i) => (
+                  <div key={p.id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
+                    <ProductCard product={p} onDownloadClick={handleDownloadClick} />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── TOOLKITS ──────────────────── */}
+          {toolkits.length > 0 && (
+            <section className="px-edge pb-section">
+              {(flagship.length > 0 || configs.length > 0) && <div className="divider-thin mb-16" />}
+              <div className="reveal mb-8">
+                <p className="section-marker mb-2">Toolkits</p>
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                {toolkits.map((p, i) => (
+                  <div key={p.id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
+                    <ProductCard product={p} onDownloadClick={handleDownloadClick} />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── BUNDLE ────────────────────── */}
+          {bundles.length > 0 && (
+            <section className="px-edge pb-section">
+              {(flagship.length > 0 || configs.length > 0 || toolkits.length > 0) && <div className="divider-glow mb-16" />}
+              <div className="reveal mb-8">
+                <p className="section-marker mb-2">The Full System</p>
+              </div>
+              <div className="reveal reveal-delay-1 max-w-3xl">
+                {bundles.map((p) => (
+                  <ProductCard key={p.id} product={p} onDownloadClick={handleDownloadClick} />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      )}
+
+      {/* ── FAQ (ONLY IF NO SEARCH AND NO SORT) ─────── */}
+      {!searchQuery && activeSort === "default" && (
+        <section className="px-edge pb-section">
+          <div className="divider-thin mb-16" />
+          <div className="reveal mb-12">
+            <p className="section-marker mb-4">Questions</p>
+            <h2 className="text-display-md font-light">Before you buy</h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
+            {[
+              {
+                q: "What platform do I need?",
+                a: "All configs are built for OpenClaw, the open-source agent platform. You'll need a Mac, Linux machine, or cloud VPS (Azure recommended). The playbook covers full setup from scratch.",
+              },
+              {
+                q: "Are these the actual production configs?",
+                a: "Yes. Sanitized for security (API keys removed, personal data stripped), but structurally identical to what runs our live deployment.",
+              },
+              {
+                q: "Do I need coding experience?",
+                a: "You need to be comfortable editing config files and running terminal commands. The playbook is detailed enough for technical non-developers, but this isn't a no-code solution.",
+              },
+              {
+                q: "What models are required?",
+                a: "The system is designed for Anthropic Claude (Opus, Sonnet, Haiku) and OpenAI Codex. You'll need API keys from both providers. Model tiering keeps costs under $8/day at full scale.",
+              },
+              {
+                q: "Is there a refund policy?",
+                a: "Yes. If the configs don't work as documented within 14 days of purchase, we'll refund in full. Digital products — no questions asked.",
+              },
+              {
+                q: "Do you offer consulting?",
+                a: "Custom deployments and strategy sprints are available. Contact us through the site for scoping and pricing.",
+              },
+            ].map((faq, i) => (
+              <div
+                key={i}
+                className={`reveal reveal-delay-${(i % 4) + 1} border-t border-white/[0.06] pt-6`}
+              >
+                <h3 className="text-body-md font-medium text-bone mb-2">
+                  {faq.q}
+                </h3>
+                <p className="text-body-sm text-ash leading-relaxed">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Global Email Modal */}
+      {selectedProduct && (
+        <EmailModal
+          isOpen={showEmailModal}
+          onClose={() => setShowEmailModal(false)}
+          productId={selectedProduct.id}
+          productName={selectedProduct.name}
+        />
+      )}
     </div>
   );
 }
