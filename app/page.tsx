@@ -1,50 +1,87 @@
 "use client";
 
 import Link from "next/link";
-import { useReveal } from "@/lib/useReveal";
-import { HOMEPAGE, AGENTS } from "@/lib/data";
-import { AgentCard } from "@/components/AgentCard";
-import ShaderBackground from "@/components/ShaderBackground";
+import {motion, useReducedMotion} from "framer-motion";
+import {useReveal} from "@/lib/useReveal";
+import {AGENTS, HOMEPAGE} from "@/lib/data";
+import {AgentCard} from "@/components/AgentCard";
+import {HeroAnimation} from "@/components/HeroAnimation";
+
+const agentStatuses = [
+    {name: "Mirai", colorClass: "beacon-mirai"},
+    {name: "JJ", colorClass: "beacon-jj"},
+    {name: "Chelsea", colorClass: "beacon-chelsea"},
+];
 
 export default function Home() {
   const revealRef = useReveal();
+    const prefersReducedMotion = useReducedMotion();
+
+    const heroItem = (delay: number) => ({
+        initial: {opacity: 0, y: prefersReducedMotion ? 0 : 24},
+        animate: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: prefersReducedMotion ? 0.3 : 0.9,
+                delay,
+                ease: [0.16, 1, 0.3, 1],
+            },
+        },
+    });
 
   return (
     <div ref={revealRef}>
       {/* ═══════════════════════════════════
           HERO SECTION WITH WEBGL SHADER ANIMATION
           ═══════════════════════════════════ */}
-      <section className="relative min-h-[100vh] flex items-center overflow-hidden">
-        {/* Premium WebGL animated background */}
-        <ShaderBackground />
+        <section className="relative min-h-[100svh] flex items-center overflow-hidden">
+            {/* Elegant brand shapes */}
+            <HeroAnimation/>
+
+            {/* Hero scanline */}
+            <div className="hero-scanline"/>
 
         {/* Architectural line */}
         <div className="absolute left-[clamp(1.5rem,5vw,6rem)] top-32 bottom-32 w-px bg-gradient-to-b from-transparent via-white/[0.06] to-transparent" />
 
         <div className="px-edge pt-32 pb-20 w-full relative z-10">
+            {/* Agent status badges */}
+            <motion.div {...heroItem(0)} className="flex flex-wrap gap-2 mb-8">
+                {agentStatuses.map((agent) => (
+                    <span key={agent.name} className="hero-badge">
+                <span className={`beacon ${agent.colorClass}`}/>
+                        {agent.name} · Online
+              </span>
+                ))}
+            </motion.div>
+
           {/* Eyebrow */}
-          <div className="reveal">
+            <motion.div {...heroItem(0.1)}>
             <p className="section-marker mb-8">
               {HOMEPAGE.hero.eyebrow}
             </p>
-          </div>
+            </motion.div>
 
           {/* Headline */}
-          <div className="reveal reveal-delay-1">
-            <h1 className="text-display-xl font-light max-w-[900px] mb-8 whitespace-pre-line">
-              {HOMEPAGE.hero.headline}
-            </h1>
-          </div>
+            <motion.h1
+                {...heroItem(0.2)}
+                className="text-display-xl font-semibold max-w-[900px] mb-8 tracking-tight leading-tight pb-2"
+            >
+                <span className="block text-bone/90">We don&apos;t use AI.</span>
+                <span className="block text-shimmer">We deploy it.</span>
+            </motion.h1>
 
           {/* Subheadline */}
-          <div className="reveal reveal-delay-2">
-            <p className="text-body-lg text-ash max-w-[600px] mb-12 leading-relaxed">
-              {HOMEPAGE.hero.subheadline}
-            </p>
-          </div>
+            <motion.p
+                {...heroItem(0.35)}
+                className="text-body-lg text-ash max-w-[600px] mb-12 leading-relaxed"
+            >
+                {HOMEPAGE.hero.subheadline}
+            </motion.p>
 
           {/* CTAs */}
-          <div className="reveal reveal-delay-3 flex flex-wrap gap-4">
+            <motion.div {...heroItem(0.5)} className="flex flex-wrap gap-4">
             <Link href={HOMEPAGE.hero.cta.href} className="btn-primary">
               <span>{HOMEPAGE.hero.cta.label}</span>
             </Link>
@@ -57,7 +94,7 @@ export default function Home() {
                 <path d="M1 7h12M8 2l5 5-5 5" stroke="currentColor" strokeWidth="1.2" />
               </svg>
             </Link>
-          </div>
+            </motion.div>
 
           {/* Scroll indicator */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-30">
@@ -67,6 +104,10 @@ export default function Home() {
             </span>
           </div>
         </div>
+
+            {/* Bottom fade */}
+            <div
+                className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-void to-transparent pointer-events-none z-[7]"/>
       </section>
 
       {/* ═══════════════════════════════════
@@ -75,7 +116,7 @@ export default function Home() {
       <section id="agents" className="py-section px-edge">
         <div className="reveal mb-16">
           <p className="section-marker mb-4">The Team</p>
-          <h2 className="text-display-lg font-light max-w-[700px]">
+            <h2 className="text-display-lg font-light max-w-[700px] tracking-tight">
             Three agents.<br />
             Three disciplines.<br />
             <span className="text-ash">One system.</span>
@@ -100,7 +141,7 @@ export default function Home() {
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <div className="reveal">
             <p className="section-marker mb-4">{HOMEPAGE.philosophy.marker}</p>
-            <h2 className="text-display-md font-light">
+              <h2 className="text-display-md font-light tracking-tight">
               {HOMEPAGE.philosophy.headline}
             </h2>
           </div>
@@ -121,7 +162,7 @@ export default function Home() {
       <section className="py-section px-edge">
         <div className="reveal mb-16">
           <p className="section-marker mb-4">{HOMEPAGE.howItWorks.marker}</p>
-          <h2 className="text-display-md font-light">
+            <h2 className="text-display-md font-light tracking-tight">
             {HOMEPAGE.howItWorks.headline}
           </h2>
         </div>
@@ -130,19 +171,17 @@ export default function Home() {
           {HOMEPAGE.howItWorks.steps.map((step, i) => (
             <div
               key={step.number}
-              className={`reveal reveal-delay-${i + 1} group`}
+              className={`reveal reveal-delay-${i + 1} group step-card border-t border-white/[0.06] pt-8`}
             >
-              <div className="border-t border-white/[0.06] pt-8 group-hover:border-mirai-glow/20 transition-colors duration-700">
-                <span className="font-mono text-caption text-mirai-glow/60 mb-4 block">
-                  {step.number}
-                </span>
-                <h3 className="text-display-sm font-light mb-4">
-                  {step.title}
+              <span className="font-mono text-caption text-mirai-glow/60 mb-4 block step-number">
+                {step.number}
+              </span>
+                <h3 className="text-display-sm font-light mb-4 tracking-tight">
+                    {step.title}
                 </h3>
                 <p className="text-body-sm text-ash leading-relaxed">
-                  {step.body}
+                    {step.body}
                 </p>
-              </div>
             </div>
           ))}
         </div>
@@ -161,7 +200,7 @@ export default function Home() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-16">
           {HOMEPAGE.metrics.items.map((metric, i) => (
             <div key={i} className={`reveal reveal-delay-${i + 1}`}>
-              <p className="text-display-md font-light text-gradient-gold mb-2">
+                <p className="text-display-md font-light text-gradient-gold mb-2 metric-value">
                 {metric.value}
               </p>
               <p className="font-mono text-caption text-ash">
@@ -176,14 +215,14 @@ export default function Home() {
           CTA SECTION
           ═══════════════════════════════════ */}
       <section className="py-section px-edge">
-        <div className="relative overflow-hidden rounded-architectural border border-white/[0.06] bg-gradient-to-br from-graphite to-carbon p-12 md:p-20">
+          <div className="relative rounded-architectural cta-card p-12 md:p-20">
           {/* Glow */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-mirai-glow/[0.04] blur-[150px] pointer-events-none" />
 
           <div className="relative z-10">
             <div className="reveal">
               <p className="section-marker mb-6">Get Started</p>
-              <h2 className="text-display-md font-light max-w-[600px] mb-6">
+                <h2 className="text-display-md font-light max-w-[600px] mb-6 tracking-tight">
                 Deploy your first agent today
               </h2>
               <p className="text-body-md text-ash max-w-[500px] mb-10">

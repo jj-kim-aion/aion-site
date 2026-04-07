@@ -1,7 +1,7 @@
 "use client";
 
-import { useReveal } from "@/lib/useReveal";
-import { ABOUT } from "@/lib/data";
+import {useReveal} from "@/lib/useReveal";
+import {ABOUT} from "@/lib/data";
 import Link from "next/link";
 
 export default function AboutPage() {
@@ -17,7 +17,7 @@ export default function AboutPage() {
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <div className="reveal">
             <p className="section-marker mb-6">{ABOUT.hero.marker}</p>
-            <h1 className="text-display-lg font-light whitespace-pre-line">
+              <h1 className="text-display-lg font-light whitespace-pre-line tracking-tight">
               {ABOUT.hero.headline}
             </h1>
           </div>
@@ -38,7 +38,7 @@ export default function AboutPage() {
 
         <div className="reveal mb-12">
           <p className="section-marker mb-4">Principles</p>
-          <h2 className="text-display-md font-light">What we believe</h2>
+            <h2 className="text-display-md font-light tracking-tight">What we believe</h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -47,7 +47,7 @@ export default function AboutPage() {
               key={i}
               className={`reveal reveal-delay-${i + 1} border-t border-white/[0.06] pt-8`}
             >
-              <h3 className="text-display-sm font-light mb-4">{p.title}</h3>
+                <h3 className="text-display-sm font-light mb-4 tracking-tight">{p.title}</h3>
               <p className="text-body-sm text-ash leading-relaxed">{p.body}</p>
             </div>
           ))}
@@ -60,7 +60,7 @@ export default function AboutPage() {
 
         <div className="reveal mb-12">
           <p className="section-marker mb-4">The Team</p>
-          <h2 className="text-display-md font-light">
+            <h2 className="text-display-md font-light tracking-tight">
             Run by agents.<br />
             <span className="text-ash">Directed by humans.</span>
           </h2>
@@ -82,19 +82,28 @@ export default function AboutPage() {
             mean it.
           </p>
           <div className="flex flex-wrap gap-6 mt-12">
-            <Link href="/agents/mirai" className="group flex items-center gap-3 border border-mirai-glow/20 hover:border-mirai-glow/40 rounded-architectural px-6 py-3 transition-colors duration-500">
+              <Link
+                  href="/agents/mirai"
+                  className="group flex items-center gap-3 border border-mirai-glow/20 hover:border-mirai-glow/40 rounded-architectural px-6 py-3 transition-all duration-400 hover:glow-mirai"
+              >
               <div className="w-2 h-2 rounded-full bg-mirai-glow/60" />
               <span className="font-mono text-caption text-ash group-hover:text-mirai-glow transition-colors uppercase">
                 Mirai — COO
               </span>
             </Link>
-            <Link href="/agents/jj" className="group flex items-center gap-3 border border-jj-glow/20 hover:border-jj-glow/40 rounded-architectural px-6 py-3 transition-colors duration-500">
+              <Link
+                  href="/agents/jj"
+                  className="group flex items-center gap-3 border border-jj-glow/20 hover:border-jj-glow/40 rounded-architectural px-6 py-3 transition-all duration-400 hover:glow-jj"
+              >
               <div className="w-2 h-2 rounded-full bg-jj-glow/60" />
               <span className="font-mono text-caption text-ash group-hover:text-jj-glow transition-colors uppercase">
                 JJ — CTO
               </span>
             </Link>
-            <Link href="/agents/chelsea" className="group flex items-center gap-3 border border-chelsea-glow/20 hover:border-chelsea-glow/40 rounded-architectural px-6 py-3 transition-colors duration-500">
+              <Link
+                  href="/agents/chelsea"
+                  className="group flex items-center gap-3 border border-chelsea-glow/20 hover:border-chelsea-glow/40 rounded-architectural px-6 py-3 transition-all duration-400 hover:glow-chelsea"
+              >
               <div className="w-2 h-2 rounded-full bg-chelsea-glow/60" />
               <span className="font-mono text-caption text-ash group-hover:text-chelsea-glow transition-colors uppercase">
                 Chelsea — CMO
@@ -111,7 +120,7 @@ export default function AboutPage() {
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           <div className="reveal">
             <p className="section-marker mb-4">{ABOUT.stack.marker}</p>
-            <h2 className="text-display-md font-light">
+              <h2 className="text-display-md font-light tracking-tight">
               {ABOUT.stack.headline}
             </h2>
           </div>
@@ -121,7 +130,7 @@ export default function AboutPage() {
               {ABOUT.stack.items.map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 py-3 border-b border-white/[0.04]"
+                  className="flex items-center gap-3 py-3 border-b border-white/[0.04] transition-all duration-300 hover:pl-1"
                 >
                   <span className="text-mirai-glow/40 text-xs">◆</span>
                   <span className="font-mono text-body-sm text-ash/80">
@@ -143,7 +152,7 @@ export default function AboutPage() {
           <div className="relative z-10 max-w-2xl">
             <div className="reveal">
               <p className="section-marker mb-8">Manifesto</p>
-              <blockquote className="text-display-sm font-light text-bone/90 leading-snug mb-8">
+                <blockquote className="text-display-sm font-light text-bone/90 leading-snug mb-8 tracking-tight">
                 &ldquo;The shift from using AI to deploying AI isn&rsquo;t about
                 the model getting smarter. It&rsquo;s about the infrastructure
                 you wrap around it. The model is the brain. Memory, tools,
