@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const { email, productId } = session.metadata || {};
+    console.log(`🔔 Received checkout.session.completed event for email ${email}`);
 
     if (!email || !productId) {
       console.error("Missing metadata in checkout session:", session.id);
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
 
       // Send email
       console.log(`📧 Sending fulfillment email to ${email}...`);
-      await resend.emails.send({
+      const { data, error: emailError } = await resend.emails.send({
         from: "Aion Research <onboarding@resend.dev>",
         to: [email],
         subject: `Your ${product.name} Download`,
@@ -65,9 +66,15 @@ export async function POST(request: NextRequest) {
         text: getDownloadEmailText(product.name, downloadUrl, email),
       });
 
-      console.log(`✅ Fulfillment complete for ${email}`);
+      if (emailError) {
+        console.error(`❌ Resend error for ${email}:`, emailError);
+        // We throw to trigger the 500 and potentially a Stripe retry
+        throw new Error(`Email failed: ${JSON.stringify(emailError)}`);
+      }
+
+      console.log(`✅ Fulfillment complete for ${email}. Message ID: ${data?.id}`);
     } catch (error) {
-      console.error("Error in fulfillment logic:", error);
+      console.error("❌ Error in fulfillment logic:", error);
       return NextResponse.json({ error: "Fulfillment failed" }, { status: 500 });
     }
   }

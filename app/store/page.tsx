@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useReveal } from "@/lib/useReveal";
 import { PRODUCTS } from "@/lib/data";
 import { EmailModal } from "@/app/components/EmailModal";
@@ -9,6 +10,92 @@ import { EmailModal } from "@/app/components/EmailModal";
 const DOWNLOAD_ROUTES: Record<string, string> = {
   "super-agent-playbook": "/api/download/super-agent-playbook",
 };
+
+function StatusNotification() {
+  const searchParams = useSearchParams();
+  const success = searchParams.get("success") === "true";
+  const canceled = searchParams.get("canceled") === "true";
+  
+  if (!success && !canceled) return null;
+
+  const handleClose = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("success");
+    url.searchParams.delete("canceled");
+    url.searchParams.delete("session_id");
+    window.history.replaceState({}, '', url);
+  };
+
+  return (
+    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md">
+      <div className={`backdrop-blur-md rounded-xl p-4 flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-500 border ${
+        success 
+          ? "bg-mirai-glow/10 border-mirai-glow/20 shadow-[0_0_30px_rgba(139,92,246,0.1)]" 
+          : "bg-red-500/10 border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.1)]"
+      }`}>
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+          success ? "bg-mirai-glow/20" : "bg-red-500/20"
+        }`}>
+          {success ? (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-mirai-glow"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-red-400"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          )}
+        </div>
+        <div>
+          <h4 className="text-bone font-medium text-sm">
+            {success ? "Payment Successful" : "Payment Canceled"}
+          </h4>
+          <p className="text-ash text-xs">
+            {success 
+              ? "We've sent the download link to your email. Please check your inbox (and spam)." 
+              : "No charges were made. If you had trouble with the checkout, please contact us."
+            }
+          </p>
+          {success && (
+            <p className="text-[10px] text-ash/40 mt-1">
+              Didn't receive it? Check spam or contact support at <span className="text-bone/60">hello@aion.research</span>
+            </p>
+          )}
+        </div>
+        <button 
+          onClick={handleClose}
+          className="ml-auto text-ash/40 hover:text-bone transition-colors self-start"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function ProductCard({ 
   product, 
@@ -157,6 +244,9 @@ export default function StorePage() {
 
   return (
     <div ref={revealRef}>
+      <Suspense fallback={null}>
+        <StatusNotification />
+      </Suspense>
       {/* ── HERO ──────────────────────── */}
       <section className="relative pt-40 pb-20 px-edge overflow-hidden">
         <div className="absolute top-[20%] right-[5%] w-[400px] h-[400px] rounded-full bg-mirai-glow/[0.03] blur-[120px] pointer-events-none" />
