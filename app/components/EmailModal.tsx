@@ -58,7 +58,7 @@ export function EmailModal({
     setLoading(true);
 
     try {
-      const res = await fetch("/api/download/request-link", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, productId }),
@@ -67,14 +67,15 @@ export function EmailModal({
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to send download link");
+        throw new Error(data.error || "Failed to initiate payment");
       }
 
-      setSuccess(true);
-      // Auto-close after 3 seconds
-      setTimeout(() => {
-        onClose();
-      }, 3000);
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("No checkout URL received");
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Something went wrong. Please try again."
@@ -125,12 +126,12 @@ export function EmailModal({
             {/* Header */}
             <div className="mb-6">
               <h2 className="text-display-sm font-light mb-2">
-                Get Your Download Link
+                Checkout
               </h2>
               <p className="text-body-sm text-ash">
-                We'll email you a secure download link for{" "}
-                <span className="text-bone">{productName}</span>. The link
-                expires in 6 hours.
+                Enter your email to proceed to secure payment for{" "}
+                <span className="text-bone">{productName}</span>. 
+                The download link will be sent after successful payment.
               </p>
             </div>
 
@@ -166,7 +167,7 @@ export function EmailModal({
                 disabled={loading || !email}
                 className="btn-primary w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Sending..." : "Send Download Link"}
+                {loading ? "Processing..." : "Continue to Payment"}
               </button>
 
               <p className="text-caption text-ash/50 text-center">
