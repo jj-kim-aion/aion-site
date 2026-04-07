@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { useReveal } from "@/lib/useReveal";
-import { PRODUCTS } from "@/lib/data";
-import { EmailModal } from "@/app/components/EmailModal";
+import {Suspense, useState} from "react";
+import {useSearchParams} from "next/navigation";
+import {useReveal} from "@/lib/useReveal";
+import {PRODUCTS} from "@/lib/data";
+import {EmailModal} from "@/app/components/EmailModal";
 
 /** Map product IDs to their download API routes */
 const DOWNLOAD_ROUTES: Record<string, string> = {
@@ -97,10 +97,10 @@ function StatusNotification() {
   );
 }
 
-function ProductCard({ 
-  product, 
-  onDownloadClick 
-}: { 
+function ProductCard({
+                         product,
+                         onDownloadClick
+                     }: {
   product: (typeof PRODUCTS)[number];
   onDownloadClick: (product: (typeof PRODUCTS)[number]) => void;
 }) {
@@ -113,11 +113,18 @@ function ProductCard({
     bundle: "Bundle",
   };
 
+    const accentTopClass: Record<string, string> = {
+        playbook: "accent-top-mirai",
+        config: "accent-top-jj",
+        toolkit: "accent-top-chelsea",
+        bundle: "accent-top-mirai",
+    };
+
   return (
     <>
       <div
         id={product.id}
-        className="rounded-2xl bg-carbon p-8 md:p-10 flex flex-col h-full relative ring-1 ring-white/5 hover:bg-graphite hover:ring-white/10 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] group overflow-hidden"
+        className={`rounded-xl bg-carbon p-8 md:p-10 flex flex-col h-full relative ring-1 ring-white/5 hover:bg-graphite hover:ring-white/10 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] group overflow-hidden ${accentTopClass[product.category]}`}
       >
         {/* Subtle glass effect gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none" />
@@ -127,7 +134,8 @@ function ProductCard({
             {categoryLabels[product.category]}
           </span>
           {product.badge && (
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/20 px-3 py-1 rounded-full">
+              <span
+                  className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/20 px-3 py-1 rounded-full backdrop-blur-sm">
               {product.badge}
             </span>
           )}

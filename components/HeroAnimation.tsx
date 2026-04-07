@@ -1,7 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
-import Link from "next/link"
+import {motion, useReducedMotion} from "framer-motion"
 
 function ElegantShape({
   className,
@@ -9,27 +8,25 @@ function ElegantShape({
   width = 400,
   height = 100,
   rotate = 0,
-  gradient = "from-white/[0.08]",
+                          gradientColor = "rgba(201,168,76,0.10)",
 }: {
   className?: string
   delay?: number
   width?: number
   height?: number
   rotate?: number
-  gradient?: string
+    gradientColor?: string
 }) {
+    const prefersReducedMotion = useReducedMotion()
+
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-        y: -150,
-        rotate: rotate - 15,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-        rotate: rotate,
-      }}
+        initial={
+            prefersReducedMotion
+                ? {opacity: 0}
+                : {opacity: 0, y: -150, rotate: rotate - 15}
+        }
+        animate={{opacity: 1, y: 0, rotate: rotate}}
       transition={{
         duration: 2.4,
         delay,
@@ -39,22 +36,21 @@ function ElegantShape({
       className={`absolute ${className}`}
     >
       <motion.div
-        animate={{
-          y: [0, 15, 0],
-        }}
+          animate={prefersReducedMotion ? {} : {y: [0, 15, 0]}}
         transition={{
           duration: 12,
-          repeat: Number.POSITIVE_INFINITY,
+            repeat: Infinity,
           ease: "easeInOut",
         }}
-        style={{
-          width,
-          height,
-        }}
+          style={{width, height}}
         className="relative"
       >
         <div
-          className={`absolute inset-0 rounded-full bg-gradient-to-r to-transparent ${gradient} backdrop-blur-[2px] border-2 border-white/[0.15] shadow-[0_8px_32px_0_rgba(255,255,255,0.1)] after:absolute after:inset-0 after:rounded-full after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]`}
+            className="absolute inset-0 rounded-full border border-white/[0.07]"
+            style={{
+                background: `linear-gradient(to right, ${gradientColor}, transparent)`,
+                boxShadow: "0 4px 24px 0 rgba(0,0,0,0.2)",
+            }}
         />
       </motion.div>
     </motion.div>
@@ -62,68 +58,65 @@ function ElegantShape({
 }
 
 export function HeroAnimation() {
-  const fadeUpVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 1,
-        delay: 0.5 + i * 0.2,
-        ease: [0.25, 0.4, 0.25, 1],
-      },
-    }),
-  }
-
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Background gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/[0.08] via-transparent to-purple-600/[0.08] blur-3xl" />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-[5]">
+          {/* Subtle brand atmosphere overlay */}
+          <div
+              className="absolute inset-0"
+              style={{
+                  background:
+                      "radial-gradient(ellipse 80% 60% at 70% 40%, rgba(201,168,76,0.03) 0%, transparent 70%), radial-gradient(ellipse 60% 50% at 20% 70%, rgba(126,200,227,0.025) 0%, transparent 60%)",
+              }}
+          />
 
-      {/* Animated shape elements */}
+          {/* Mirai gold shape — left upper */}
       <ElegantShape
         delay={0.3}
-        width={600}
-        height={140}
-        rotate={12}
-        gradient="from-blue-500/[0.12]"
-        className="left-[-10%] md:left-[-5%] top-[15%] md:top-[20%]"
+        width={560}
+        height={130}
+        rotate={11}
+        gradientColor="rgba(201,168,76,0.09)"
+        className="left-[-8%] md:left-[-3%] top-[18%] md:top-[22%]"
       />
 
+          {/* Chelsea copper shape — right lower */}
       <ElegantShape
         delay={0.5}
-        width={500}
-        height={120}
-        rotate={-15}
-        gradient="from-purple-500/[0.12]"
-        className="right-[-5%] md:right-[0%] top-[70%] md:top-[75%]"
+        width={480}
+        height={110}
+        rotate={-14}
+        gradientColor="rgba(212,149,106,0.09)"
+        className="right-[-4%] md:right-[1%] top-[68%] md:top-[72%]"
       />
 
+          {/* JJ cyan shape — left lower */}
       <ElegantShape
         delay={0.4}
-        width={300}
-        height={80}
-        rotate={-8}
-        gradient="from-indigo-500/[0.12]"
-        className="left-[5%] md:left-[10%] bottom-[5%] md:bottom-[10%]"
+        width={280}
+        height={75}
+        rotate={-7}
+        gradientColor="rgba(126,200,227,0.08)"
+        className="left-[6%] md:left-[12%] bottom-[8%] md:bottom-[12%]"
       />
 
+          {/* Mirai small — right upper */}
       <ElegantShape
         delay={0.6}
-        width={200}
-        height={60}
-        rotate={20}
-        gradient="from-cyan-500/[0.12]"
-        className="right-[15%] md:right-[20%] top-[10%] md:top-[15%]"
+        width={190}
+        height={55}
+        rotate={18}
+        gradientColor="rgba(201,168,76,0.07)"
+        className="right-[16%] md:right-[22%] top-[12%] md:top-[16%]"
       />
 
+          {/* Chelsea small — left upper */}
       <ElegantShape
-        delay={0.7}
-        width={150}
-        height={40}
-        rotate={-25}
-        gradient="from-pink-500/[0.12]"
-        className="left-[20%] md:left-[25%] top-[5%] md:top-[10%]"
+          delay={0.75}
+          width={140}
+          height={38}
+          rotate={-22}
+          gradientColor="rgba(212,149,106,0.07)"
+          className="left-[22%] md:left-[28%] top-[6%] md:top-[9%]"
       />
     </div>
   )
