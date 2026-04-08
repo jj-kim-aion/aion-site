@@ -86,7 +86,7 @@ export function getDownloadEmailHTML(
               </p>
               <p style="margin: 0; font-size: 13px; color: #737373;">
                 Questions? Reply to this email or reach us at 
-                <a href="mailto:tech@aionresearch.io" style="color: #a78bfa; text-decoration: none;">tech@aionresearch.io</a>
+                <a href="mailto:research@aionlabs.io" style="color: #a78bfa; text-decoration: none;">research@aionlabs.io</a>
               </p>
               <p style="margin: 16px 0 0 0; font-size: 11px; color: #525252;">
                 © ${new Date().getFullYear()} Aion Research. All rights reserved.
@@ -138,7 +138,7 @@ The link is unique to you and becomes invalid after download.
 
 This email was sent to ${recipientEmail}
 
-Questions? Reply to this email or contact us at tech@aionresearch.io
+Questions? Reply to this email or contact us at research@aionlabs.io
 
 © ${new Date().getFullYear()} Aion Research. All rights reserved.
   `.trim();

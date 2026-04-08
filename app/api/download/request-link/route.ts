@@ -88,9 +88,9 @@ export async function POST(request: NextRequest) {
       console.log(`📧 Sending download email to ${email}...`);
       
       const { data, error } = await resend.emails.send({
-        from: "Aion Research <onboarding@resend.dev>", // Resend's verified test domain
+        from: "Aion Research <research@aionlabs.io>",
         to: [email],
-        replyTo: "onboarding@resend.dev",
+        replyTo: "research@aionlabs.io",
         subject: "Your Aion Super Agents Playbook Download",
         html: getDownloadEmailHTML(productName, downloadUrl, email),
         text: getDownloadEmailText(productName, downloadUrl, email),

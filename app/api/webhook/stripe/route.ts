@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       // Send email
       console.log(`📧 Sending fulfillment email to ${email}...`);
       const { data, error: emailError } = await resend.emails.send({
-        from: "Aion Research <onboarding@resend.dev>",
+        from: "Aion Research <research@aionlabs.io>",
         to: [email],
         subject: `Your ${product.name} Download`,
         html: getDownloadEmailHTML(product.name, downloadUrl, email),
