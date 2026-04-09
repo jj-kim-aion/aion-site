@@ -164,7 +164,7 @@ export const PRODUCTS: Product[] = [
       "The complete system for deploying autonomous AI agents that run your business. Memory architecture, safety frameworks, multi-agent coordination, and revenue automation — from zero to fully operational in 3 weeks.",
     longDescription:
       "This isn't theory. It's the exact system we used to build Mirai, JJ, and Chelsea. Every configuration file, every cron job, every safety rule, every memory template — production-tested and ready to deploy. The playbook covers identity design, the three-layer memory architecture, the trust ladder, Mission Control setup, multi-agent team deployment, revenue tool integration, parallel coding patterns, and autonomous bug fixing. Over 15,000 words of implementation detail with copy-paste configs.",
-    price: 199,
+    price: 1,
     badge: "Flagship",
     category: "playbook",
     features: [
