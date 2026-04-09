@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     console.log("📧 Attempting to send test email...");
     
     const { data, error } = await resend.emails.send({
-      from: "Aion Research <aion@aionresearch.io>",
+      from: "Aion Research <research@aionlabs.io>",
       to: ["delivered@resend.dev"], // Resend's test inbox
       subject: "Resend Test - Aion Site",
       html: "<p>This is a test email from Aion site to verify Resend configuration.</p>",
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       emailId: data?.id,
       details: {
         apiKey: `${apiKey.substring(0, 10)}...${apiKey.substring(apiKey.length - 4)}`,
-        from: "Aion Research <aion@aionresearch.io>",
+        from: "Aion Research <research@aionlabs.io>",
         to: "delivered@resend.dev",
       },
     });
