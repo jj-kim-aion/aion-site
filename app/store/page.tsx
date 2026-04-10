@@ -11,11 +11,13 @@ const DOWNLOAD_ROUTES: Record<string, string> = {
   "super-agent-playbook": "/api/download/super-agent-playbook",
 };
 
+/* ─── Status Notification ───────────────────────────────── */
+
 function StatusNotification() {
   const searchParams = useSearchParams();
   const success = searchParams.get("success") === "true";
   const canceled = searchParams.get("canceled") === "true";
-  
+
   if (!success && !canceled) return null;
 
   const handleClose = () => {
@@ -23,45 +25,31 @@ function StatusNotification() {
     url.searchParams.delete("success");
     url.searchParams.delete("canceled");
     url.searchParams.delete("session_id");
-    window.history.replaceState({}, '', url);
+    window.history.replaceState({}, "", url);
   };
 
   return (
     <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md">
-      <div className={`backdrop-blur-md rounded-xl p-4 flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-500 border ${
-        success 
-          ? "bg-mirai-glow/10 border-mirai-glow/20 shadow-[0_0_30px_rgba(139,92,246,0.1)]" 
-          : "bg-red-500/10 border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.1)]"
-      }`}>
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-          success ? "bg-mirai-glow/20" : "bg-red-500/20"
-        }`}>
+      <div
+          className={`backdrop-blur-md rounded-xl p-4 flex items-center gap-4 animate-in fade-in slide-in-from-top-4 duration-500 border ${
+              success
+                  ? "bg-mirai-glow/10 border-mirai-glow/20 shadow-[0_0_30px_rgba(201,168,76,0.1)]"
+                  : "bg-red-500/10 border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.1)]"
+          }`}
+      >
+        <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                success ? "bg-mirai-glow/20" : "bg-red-500/20"
+            }`}
+        >
           {success ? (
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-mirai-glow"
-            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                   strokeLinecap="round" strokeLinejoin="round" className="text-mirai-glow">
               <polyline points="20 6 9 17 4 12" />
             </svg>
           ) : (
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-red-400"
-            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                   strokeLinecap="round" strokeLinejoin="round" className="text-red-400">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -72,18 +60,18 @@ function StatusNotification() {
             {success ? "Payment Successful" : "Payment Canceled"}
           </h4>
           <p className="text-ash text-xs">
-            {success 
-              ? "We've sent the download link to your email. Please check your inbox (and spam)." 
-              : "No charges were made. If you had trouble with the checkout, please contact us."
-            }
+            {success
+                ? "We've sent the download link to your email. Please check your inbox (and spam)."
+                : "No charges were made. If you had trouble with the checkout, please contact us."}
           </p>
           {success && (
             <p className="text-[10px] text-ash/40 mt-1">
-              Didn't receive it? Check spam or contact support at <span className="text-bone/60">hello@aion.research</span>
+              Didn't receive it? Check spam or contact support at{" "}
+              <span className="text-bone/60">hello@aion.research</span>
             </p>
           )}
         </div>
-        <button 
+        <button
           onClick={handleClose}
           className="ml-auto text-ash/40 hover:text-bone transition-colors self-start"
         >
@@ -97,35 +85,29 @@ function StatusNotification() {
   );
 }
 
+/* ─── Product Modal ─────────────────────────────────────── */
+
 function ProductModal({
                         product,
                         isOpen,
                         onClose,
-                        onBuyClick
+                        onBuyClick,
                       }: {
   product: Product;
   isOpen: boolean;
   onClose: () => void;
   onBuyClick: (product: Product) => void;
 }) {
-  // Prevent body scroll when modal is open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    document.body.style.overflow = isOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
-  // Close on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
+      if (e.key === "Escape" && isOpen) onClose();
     };
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
@@ -143,10 +125,7 @@ function ProductModal({
   const categoryLabel = categoryLabels[product.category] || "Product";
 
   return (
-      <div
-          className="fixed inset-0 z-[80] flex items-center justify-center p-4 md:p-8"
-          onClick={onClose}
-      >
+      <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 md:p-8" onClick={onClose}>
         {/* Backdrop */}
         <div className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"/>
 
@@ -154,6 +133,7 @@ function ProductModal({
         <div
             className="relative bg-carbon border border-white/[0.08] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-300"
             onClick={(e) => e.stopPropagation()}
+            style={{boxShadow: "0 20px 40px rgba(0,0,0,0.6), 0 0 15px rgba(201,168,76,0.05)"}}
         >
         {/* Header */}
           <div
@@ -191,7 +171,6 @@ function ProductModal({
                 <p className="text-body-lg text-bone/90 leading-relaxed mb-8 font-medium">
                   {product.product_summary}
                 </p>
-
                 <div className="prose prose-invert max-w-none">
                   <p className="text-ash leading-relaxed whitespace-pre-wrap">
                     {product.detailed_description}
@@ -238,13 +217,9 @@ function ProductModal({
           <div
               className="p-6 border-t border-white/[0.04] bg-void/50 backdrop-blur-sm flex flex-col sm:flex-row items-center justify-between gap-6 sticky bottom-0">
             <div className="flex items-baseline gap-3">
-            <span className="text-display-sm font-light text-bone">
-              ${product.price}
-            </span>
+              <span className="text-display-sm font-light text-bone">${product.price}</span>
               {product.original_price && (
-                  <span className="text-body-md text-ash/50 line-through">
-                ${product.original_price}
-              </span>
+                  <span className="text-body-md text-ash/50 line-through">${product.original_price}</span>
               )}
             </div>
             <button
@@ -267,84 +242,270 @@ function ProductModal({
   );
 }
 
-function ProductCard({
-                       product,
-                       onViewClick
-                     }: {
-  product: Product;
-  onViewClick: (product: Product) => void;
-}) {
-  const downloadRoute = DOWNLOAD_ROUTES[product.product_id];
+/* ─── Category Badge ────────────────────────────────────── */
 
-  const categoryLabels: Record<string, string> = {
+function CategoryBadge({category}: { category: string }) {
+  const styles: Record<string, string> = {
+    playbook: "bg-mirai-glow/10 border-mirai-glow/20 text-mirai-glow",
+    config: "bg-jj-glow/10 border-jj-glow/20 text-jj-glow",
+    toolkit: "bg-chelsea-glow/10 border-chelsea-glow/20 text-chelsea-glow",
+    bundle: "bg-mirai-glow/10 border-mirai-glow/20 text-mirai-glow",
+  };
+  const labels: Record<string, string> = {
     playbook: "Playbook",
-    config: "Configuration",
+    config: "Config",
     toolkit: "Toolkit",
     bundle: "Bundle",
   };
 
-  const accentTopClass: Record<string, string> = {
-    playbook: "accent-top-mirai",
-    config: "accent-top-jj",
-    toolkit: "accent-top-chelsea",
-    bundle: "accent-top-mirai",
-  };
+  return (
+      <span
+          className={`px-2 py-1 border rounded font-mono text-[0.55rem] uppercase tracking-[0.2em] backdrop-blur-md ${
+              styles[category] ?? "bg-white/5 border-white/10 text-ash"
+          }`}
+      >
+      {labels[category] ?? "Product"}
+    </span>
+  );
+}
 
-  const categoryLabel = categoryLabels[product.category] || "Product";
-  const accentClass = accentTopClass[product.category] || "accent-top-mirai";
+/* ─── Featured Card (bundle / first result) ─────────────── */
+
+function FeaturedCard({
+                        product,
+                        onViewClick,
+                      }: {
+  product: Product;
+  onViewClick: (p: Product) => void;
+}) {
+  return (
+      <section
+          className="group relative overflow-hidden rounded-2xl transition-all duration-500"
+          style={{
+            background: "rgba(17,17,17,0.4)",
+            backdropFilter: "blur(40px)",
+            border: "1px solid rgba(201,168,76,0.08)",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.boxShadow =
+                "0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(201,168,76,0.12)";
+            (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,168,76,0.25)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.boxShadow = "none";
+            (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,168,76,0.08)";
+          }}
+      >
+        <div className="grid md:grid-cols-2 gap-0 min-h-[380px]">
+          {/* Visual side */}
+          <div className="relative overflow-hidden bg-obsidian min-h-[220px]">
+            {/* Abstract circuit pattern background */}
+            <div
+                className="absolute inset-0 opacity-20"
+                style={{
+                  backgroundImage: `
+                linear-gradient(rgba(201,168,76,0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(201,168,76,0.15) 1px, transparent 1px)
+              `,
+                  backgroundSize: "40px 40px",
+                }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-mirai-glow/5 via-transparent to-transparent"/>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-[#111111]/60 md:hidden"/>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/80 to-transparent hidden md:block"/>
+
+            {/* Decorative orb */}
+            <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] rounded-full opacity-20 group-hover:opacity-35 transition-opacity duration-700"
+                style={{background: "radial-gradient(circle, rgba(201,168,76,0.4) 0%, transparent 70%)"}}
+            />
+            <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120px] h-[120px] rounded-full border border-mirai-glow/20 group-hover:scale-150 transition-transform duration-1000"/>
+            <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60px] h-[60px] rounded-full border border-mirai-glow/30 group-hover:scale-125 transition-transform duration-700"/>
+          </div>
+
+          {/* Info side */}
+          <div className="p-10 lg:p-14 flex flex-col justify-center relative z-10">
+            <div
+                className="inline-flex items-center px-3 py-1.5 bg-mirai-glow/10 border border-mirai-glow/20 rounded-full mb-6 w-fit">
+            <span className="font-mono text-[0.55rem] uppercase tracking-[0.25em] text-mirai-glow">
+              Premium Collection
+            </span>
+            </div>
+
+            <h2 className="font-display text-3xl lg:text-4xl font-bold text-bone mb-5 uppercase tracking-tight leading-tight">
+              {product.name}
+            </h2>
+
+            <p className="text-ash/70 mb-10 text-base leading-relaxed">
+              {product.product_summary}
+            </p>
+
+            <div className="flex items-center gap-10 mb-10">
+              <div>
+                <p className="font-mono text-[0.55rem] uppercase tracking-[0.2em] text-ash mb-1.5">
+                  Acquisition
+                </p>
+                <p className="text-3xl font-bold text-mirai-glow">${product.price}</p>
+              </div>
+              <div className="h-10 w-px bg-white/10"/>
+              <div>
+                <p className="font-mono text-[0.55rem] uppercase tracking-[0.2em] text-ash mb-1.5">
+                  Status
+                </p>
+                <p className="text-[0.65rem] font-mono text-jj-glow uppercase tracking-widest">
+                  Active Link
+                </p>
+              </div>
+            </div>
+
+            <button
+                onClick={() => onViewClick(product)}
+                className="w-full md:w-fit px-10 py-3.5 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-void rounded transition-all duration-300 hover:brightness-110 hover:shadow-[0_0_20px_rgba(201,168,76,0.3)]"
+                style={{background: "linear-gradient(135deg, #c9a84c 0%, #7a6930 100%)"}}
+            >
+              View Details
+            </button>
+          </div>
+        </div>
+      </section>
+  );
+}
+
+/* ─── Standard Product Card ─────────────────────────────── */
+
+function ProductCard({
+                       product,
+                       onViewClick,
+                     }: {
+  product: Product;
+  onViewClick: (p: Product) => void;
+}) {
+  const isBundle = product.category === "bundle";
+  const glowColor = isBundle
+      ? "rgba(201,168,76,0.15)"
+      : product.category === "config"
+          ? "rgba(126,200,227,0.15)"
+          : product.category === "toolkit"
+              ? "rgba(212,149,106,0.15)"
+              : "rgba(201,168,76,0.15)";
+
+  const borderHoverColor = isBundle
+      ? "rgba(201,168,76,0.3)"
+      : product.category === "config"
+          ? "rgba(126,200,227,0.3)"
+          : product.category === "toolkit"
+              ? "rgba(212,149,106,0.3)"
+              : "rgba(201,168,76,0.3)";
 
   return (
-      <div
+      <article
           id={product.product_id}
-          className={`rounded-xl bg-carbon p-6 flex flex-col relative ring-1 ring-white/5 hover:bg-graphite hover:ring-white/10 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] group overflow-hidden w-full max-w-[320px] min-h-[360px] ${accentClass}`}
+          className="group relative flex flex-col h-full rounded-2xl p-6 transition-all duration-500 cursor-pointer"
+          style={{
+            background: "rgba(17,17,17,0.4)",
+            backdropFilter: "blur(40px)",
+            border: "1px solid rgba(142,145,146,0.08)",
+          }}
+          onMouseEnter={(e) => {
+            const el = e.currentTarget as HTMLElement;
+            el.style.boxShadow = `0 20px 40px rgba(0,0,0,0.8), 0 0 15px ${glowColor}`;
+            el.style.borderColor = borderHoverColor;
+            el.style.transform = "translateY(-4px)";
+          }}
+          onMouseLeave={(e) => {
+            const el = e.currentTarget as HTMLElement;
+            el.style.boxShadow = "none";
+            el.style.borderColor = "rgba(142,145,146,0.08)";
+            el.style.transform = "translateY(0)";
+          }}
+          onClick={() => onViewClick(product)}
       >
-        {/* Subtle glass effect gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none"/>
+        {/* Image thumbnail area */}
+        <div className="relative aspect-square mb-7 rounded-xl overflow-hidden bg-carbon">
+          {/* Abstract visual based on category */}
+          <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+            `,
+                backgroundSize: "30px 30px",
+              }}
+          />
+          <div
+              className="absolute inset-0 opacity-30 group-hover:opacity-60 transition-opacity duration-700"
+              style={{
+                background: `radial-gradient(circle at 50% 50%, ${
+                    product.category === "config"
+                        ? "rgba(126,200,227,0.3)"
+                        : product.category === "toolkit"
+                            ? "rgba(212,149,106,0.3)"
+                            : "rgba(201,168,76,0.3)"
+                } 0%, transparent 70%)`,
+              }}
+          />
+          {/* Animated ring */}
+          <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-white/10 group-hover:scale-150 group-hover:opacity-0 transition-all duration-700"/>
+          <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-white/20"/>
 
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-        <span className="font-mono text-[0.6rem] text-ash/60 uppercase tracking-widest">
-          {categoryLabel}
-        </span>
+          {/* Category badge overlay */}
+          <div className="absolute top-4 left-4">
+            <CategoryBadge category={product.category}/>
+          </div>
+
+          {/* Product badge */}
           {product.badge && (
-              <span
-                  className="font-mono text-[0.55rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/20 px-2 py-0.5 rounded-full backdrop-blur-sm">
-            {product.badge}
-          </span>
+              <div className="absolute top-4 right-4">
+            <span
+                className="px-2 py-1 bg-mirai-glow/10 border border-mirai-glow/25 rounded font-mono text-[0.5rem] uppercase tracking-[0.2em] text-mirai-glow">
+              {product.badge}
+            </span>
+              </div>
           )}
         </div>
 
-        {/* Title */}
-        <h3 className="text-xl font-light mb-3 text-bone group-hover:text-white transition-colors min-h-[3.5rem] flex items-center">{product.name}</h3>
-
-        {/* Description - Brief summary */}
-        <p className="text-body-sm text-ash/80 leading-relaxed mb-6">
+        {/* Content */}
+        <div className="flex-1 flex flex-col">
+          <h3 className="font-display text-base font-bold text-bone mb-2.5 uppercase tracking-tight group-hover:text-ivory transition-colors">
+            {product.name}
+          </h3>
+          <p className="text-sm text-ash/70 mb-8 leading-relaxed flex-1">
           {product.product_summary}
         </p>
 
-        {/* Price + CTA */}
-        <div className="mt-auto pt-4 flex items-center justify-between border-t border-white/[0.04]">
-          <div className="flex items-baseline gap-2">
-          <span className="text-lg font-light text-bone">
-            ${product.price}
-          </span>
+          {/* Footer */}
+          <div
+              className="mt-auto flex items-end justify-between pt-5"
+              style={{borderTop: "0.5px solid rgba(53,53,52,0.8)"}}
+          >
+            <div>
+              <p className="font-mono text-[0.5rem] uppercase tracking-[0.2em] text-ash/50 mb-1">
+                Transfer Unit
+              </p>
+              <p className="text-2xl font-bold text-bone">${product.price}</p>
           </div>
           <button
-              className="text-[0.7rem] font-mono uppercase tracking-[0.2em] text-mirai-glow hover:text-white transition-colors flex items-center gap-2 group/btn"
-              onClick={() => onViewClick(product)}
+              className="w-11 h-11 flex items-center justify-center rounded-lg border border-white/10 text-ash hover:border-mirai-glow/40 hover:text-mirai-glow transition-all duration-300 bg-graphite/50"
+              aria-label={`View ${product.name}`}
           >
-            <span>View & Buy</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                 strokeLinecap="round" strokeLinejoin="round"
-                 className="group-hover/btn:translate-x-1 transition-transform">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                 strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"/>
               <polyline points="12 5 19 12 12 19"/>
             </svg>
           </button>
         </div>
       </div>
+      </article>
   );
 }
+
+/* ─── Main Store Page ────────────────────────────────────── */
 
 export default function StorePage() {
   const revealRef = useReveal();
@@ -353,51 +514,34 @@ export default function StorePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [activeSort, setActiveSort] = useState("default");
-
-  useEffect(() => {
-    // When filters change, we need to ensure they are visible
-    // since the reveal animation might not trigger if they are already in viewport
-    const timer = setTimeout(() => {
-      window.dispatchEvent(new Event('scroll'));
-      const hidden = document.querySelectorAll(".reveal:not(.visible)");
-      if (hidden.length > 0) {
-        hidden.forEach(el => el.classList.add("visible"));
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [activeFilter, activeSort, searchQuery]);
-
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showProductModal, setShowProductModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
 
   useEffect(() => {
-    console.log("StorePage: Fetching products...");
-    getProducts().then(data => {
-      console.log("StorePage: Received products:", data);
-      if (data && data.length > 0) {
-        setProducts(data);
-      } else {
-        console.warn("StorePage: No products returned from Supabase.");
-      }
-      setLoading(false);
-      // Force an extra check for reveal elements after state update
-      setTimeout(() => {
-        window.dispatchEvent(new Event('scroll'));
-        console.log("StorePage: Triggered scroll event for reveal animations.");
-
-        // Final fallback: just mark everything visible if it's still hidden
-        const hidden = document.querySelectorAll(".reveal:not(.visible)");
-        if (hidden.length > 0) {
-          console.log(`StorePage: Forcing visibility for ${hidden.length} elements.`);
-          hidden.forEach(el => el.classList.add("visible"));
-        }
-      }, 500); // Increased timeout to ensure DOM is fully ready
-    }).catch(err => {
-      console.error("StorePage: Error in useEffect:", err);
-      setLoading(false);
-    });
+    getProducts()
+        .then((data) => {
+          if (data && data.length > 0) setProducts(data);
+          setLoading(false);
+          setTimeout(() => {
+            window.dispatchEvent(new Event("scroll"));
+            document.querySelectorAll(".reveal:not(.visible)").forEach((el) =>
+                el.classList.add("visible")
+            );
+          }, 500);
+        })
+        .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new Event("scroll"));
+      document.querySelectorAll(".reveal:not(.visible)").forEach((el) =>
+          el.classList.add("visible")
+      );
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [activeFilter, activeSort, searchQuery]);
 
   function handleViewClick(product: Product) {
     setSelectedProduct(product);
@@ -410,11 +554,6 @@ export default function StorePage() {
     setShowEmailModal(true);
   }
 
-  function handleDownloadClick(product: Product) {
-    setSelectedProduct(product);
-    setShowEmailModal(true);
-  }
-
   const sortedProducts = [...products].sort((a, b) => {
     if (activeSort === "price-asc") return a.price - b.price;
     if (activeSort === "price-desc") return b.price - a.price;
@@ -423,22 +562,20 @@ export default function StorePage() {
 
   const filteredProducts = sortedProducts.filter((p) => {
     const query = searchQuery.toLowerCase();
-    const nameMatch = p.name.toLowerCase().includes(query);
-    const summaryMatch = p.product_summary.toLowerCase().includes(query);
-    const categoryMatch = p.category.toLowerCase().includes(query);
-    const searchMatch = nameMatch || summaryMatch || categoryMatch;
-    
-    if (activeFilter === "all") return searchMatch;
-    return searchMatch && p.category === activeFilter;
+    const match =
+        p.name.toLowerCase().includes(query) ||
+        p.product_summary.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query);
+    if (activeFilter === "all") return match;
+    return match && p.category === activeFilter;
   });
 
-  console.log("StorePage: Filtered products count:", filteredProducts.length, {
-    total: products.length,
-    searchQuery,
-    activeFilter,
-    activeSort,
-    firstProduct: filteredProducts[0]?.name
-  });
+  // Separate featured (bundle) from regular products
+  const featuredProduct =
+      filteredProducts.find((p) => p.category === "bundle") ?? filteredProducts[0];
+  const gridProducts = featuredProduct
+      ? filteredProducts.filter((p) => p.product_id !== featuredProduct.product_id)
+      : [];
 
   const hasResults = filteredProducts.length > 0;
 
@@ -455,120 +592,178 @@ export default function StorePage() {
       <Suspense fallback={null}>
         <StatusNotification />
       </Suspense>
-      {/* ── HERO ──────────────────────── */}
-      <section className="relative pt-40 pb-20 px-edge overflow-hidden">
-        <div className="absolute top-[20%] right-[5%] w-[400px] h-[400px] rounded-full bg-mirai-glow/[0.03] blur-[120px] pointer-events-none" />
 
-        <div className="reveal">
-          <p className="section-marker mb-6">Store</p>
-          <h1 className="text-display-lg font-light max-w-[700px] mb-6">
-            The systems we run.<br />
-            <span className="text-ash">Packaged for you.</span>
-          </h1>
-          <p className="text-body-lg text-ash max-w-[550px] leading-relaxed">
-            Every product is a production-tested configuration from our live
-            deployment. No demo-ware. No theory. These are the actual files and
-            playbooks running Mirai, JJ, and Chelsea right now.
-          </p>
-        </div>
-      </section>
+      {/* Subtle grid background wrapper */}
+      <div
+          style={{
+            backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)
+          `,
+            backgroundSize: "60px 60px",
+          }}
+      >
+        {/* ── HERO ─────────────────────────────────── */}
+        <section className="relative pt-40 pb-16 px-edge overflow-hidden">
+          <div className="absolute top-[10%] right-[8%] w-[500px] h-[500px] rounded-full pointer-events-none"
+               style={{background: "radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%)"}}
+          />
 
-      {/* ── SEARCH BAR (PINNED) ───────── */}
-      <div className="sticky top-0 z-50 px-edge py-6 bg-void/90 backdrop-blur-md border-b border-white/[0.04] shadow-[0_20px_50px_rgba(0,0,0,0.3)] mb-12 translate-y-[-1px]">
-        <div className="max-w-4xl mx-auto flex flex-col gap-5">
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-ash group-focus-within:text-mirai-glow transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            </div>
-            <input
-              type="text"
-              placeholder={`Search ${products.length} products, toolkits, playbooks...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-carbon/50 hover:bg-carbon text-bone focus:outline-none ring-1 ring-white/10 focus:ring-mirai-glow/80 focus:bg-carbon pl-14 pr-6 py-4 rounded-xl transition-all font-body text-body-md shadow-inner"
-            />
-          </div>
-          
-          {/* Filters */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-2">
-              {[
-                { id: "all", label: "All Products" },
-                { id: "playbook", label: "Playbooks" },
-                { id: "config", label: "Configurations" },
-                { id: "toolkit", label: "Toolkits" },
-                { id: "bundle", label: "Bundles" },
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setActiveFilter(f.id)}
-                  className={`px-5 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all duration-300 ${
-                    activeFilter === f.id
-                      ? "bg-bone text-void shadow-[0_0_15px_rgba(255,255,255,0.3)]"
-                      : "bg-carbon/40 text-ash ring-1 ring-white/10 hover:bg-carbon hover:text-bone hover:ring-white/20"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="text-[0.65rem] font-mono uppercase tracking-widest text-ash/40">Sort:</span>
-              <select
-                value={activeSort}
-                onChange={(e) => setActiveSort(e.target.value)}
-                className="bg-carbon/40 text-ash text-xs font-mono uppercase tracking-wider px-3 py-2 rounded-lg ring-1 ring-white/10 focus:outline-none focus:ring-mirai-glow/50 appearance-none cursor-pointer hover:bg-carbon hover:text-bone transition-all"
-              >
-                <option value="default">Default</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {!hasResults && (
-        <section className="px-edge py-section flex flex-col items-center justify-center text-center">
-          <p className="text-body-lg text-ash mb-4">No assets match the criteria</p>
-          <button onClick={() => { setSearchQuery(""); setActiveFilter("all"); setActiveSort("default"); }} className="text-mirai-glow hover:text-mirai-soft underline underline-offset-4 text-sm font-mono tracking-wide">
-            Clear All Filters
-          </button>
-        </section>
-      )}
-
-      {/* ── PRODUCT GRID (UNIFIED) ─────── */}
-      {hasResults && (
-        <section className="px-edge pb-section">
-          <div className="reveal mb-8">
-            <p className="section-marker mb-2">
-              {searchQuery ? "Search Results" : activeFilter !== "all" ? `${activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1)}s` : "All Products"}
+          <div className="reveal">
+            <p className="font-mono text-[0.6rem] uppercase tracking-[0.4em] text-ash/50 mb-6">
+              // Store
             </p>
-            {(searchQuery || activeSort !== "default") && (
-                <p className="text-ash text-sm">
-                  {searchQuery
-                      ? `Showing ${filteredProducts.length} items for "${searchQuery}"`
-                      : `Showing ${filteredProducts.length} items sorted by ${activeSort.replace(/-/g, ' ')}`
-                  }
-                </p>
-            )}
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((p, i) => (
-                <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
-                  <ProductCard product={p} onViewClick={handleViewClick}/>
-                </div>
-            ))}
+            <h1 className="font-display text-display-lg font-extrabold tracking-tight text-bone leading-[1.05] max-w-[700px] mb-6">
+              The systems we run.
+              <br/>
+              <span className="text-ash/40">Packaged for you.</span>
+            </h1>
+            <p className="text-body-lg text-ash max-w-[550px] leading-relaxed">
+              Every product is a production-tested configuration from our live
+              deployment. No demo-ware. No theory. These are the actual files and
+              playbooks running Mirai, JJ, and Chelsea right now.
+            </p>
           </div>
         </section>
-      )}
 
-      {/* ── FAQ ─────── */}
-      <section className="px-edge pb-section">
+        {/* ── SEARCH BAR (PINNED) ───────────────────── */}
+        <div
+            className="sticky top-0 z-50 px-edge py-5 bg-void/90 backdrop-blur-md border-b border-white/[0.04] shadow-[0_20px_50px_rgba(0,0,0,0.3)] mb-14 -translate-y-px">
+          <div className="max-w-4xl mx-auto flex flex-col gap-5">
+            {/* Search input */}
+            <div className="relative group">
+              <div
+                  className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-ash group-focus-within:text-mirai-glow transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </div>
+              <input
+                  type="text"
+                  placeholder={`Search ${products.length} products, toolkits, playbooks…`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-carbon/50 hover:bg-carbon text-bone focus:outline-none focus:bg-carbon pl-14 pr-6 py-4 rounded-xl transition-all font-body text-body-md shadow-inner"
+                  style={{
+                    border: "1px solid rgba(142,145,146,0.15)",
+                    outline: "none",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(201,168,76,0.5)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(142,145,146,0.15)";
+                  }}
+              />
+            </div>
+
+            {/* Filter chips + sort */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-2">
+                {[
+                  {id: "all", label: "All Products"},
+                  {id: "playbook", label: "Playbooks"},
+                  {id: "config", label: "Configurations"},
+                  {id: "toolkit", label: "Toolkits"},
+                  {id: "bundle", label: "Bundles"},
+                ].map((f) => (
+                    <button
+                        key={f.id}
+                        onClick={() => setActiveFilter(f.id)}
+                        className={`px-5 py-2 rounded-full text-[0.6rem] font-mono uppercase tracking-widest transition-all duration-300 ${
+                            activeFilter === f.id
+                                ? "bg-bone text-void shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                                : "bg-carbon/40 text-ash border border-white/10 hover:bg-carbon hover:text-bone hover:border-white/20"
+                        }`}
+                    >
+                      {f.label}
+                    </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-[0.55rem] font-mono uppercase tracking-[0.25em] text-ash/40">
+                  Sort:
+                </span>
+                <select
+                    value={activeSort}
+                    onChange={(e) => setActiveSort(e.target.value)}
+                    className="bg-carbon/40 text-ash text-[0.6rem] font-mono uppercase tracking-wider px-3 py-2 rounded-lg border border-white/10 focus:outline-none focus:border-mirai-glow/50 appearance-none cursor-pointer hover:bg-carbon hover:text-bone transition-all"
+                >
+                  <option value="default">Default</option>
+                  <option value="price-asc">Price: Low → High</option>
+                  <option value="price-desc">Price: High → Low</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── CATALOG ──────────────────────────────── */}
+        <main className="px-edge pb-section">
+
+          {/* No results */}
+          {!hasResults && (
+              <section className="py-section flex flex-col items-center justify-center text-center">
+                <p className="text-body-lg text-ash mb-4">No assets match the criteria</p>
+                <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setActiveFilter("all");
+                      setActiveSort("default");
+                    }}
+                    className="text-mirai-glow hover:text-mirai-soft underline underline-offset-4 text-sm font-mono tracking-wide"
+                >
+                  Clear All Filters
+                </button>
+              </section>
+          )}
+
+          {hasResults && (
+              <div className="reveal space-y-6">
+                {/* Section label */}
+                <div className="mb-10">
+                  <p className="section-marker mb-2">
+                    {searchQuery
+                        ? "Search Results"
+                        : activeFilter !== "all"
+                            ? `${activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1)}s`
+                            : "All Products"}
+                  </p>
+                  {(searchQuery || activeSort !== "default") && (
+                      <p className="text-ash text-sm">
+                        {searchQuery
+                      ? `Showing ${filteredProducts.length} items for "${searchQuery}"`
+                            : `Showing ${filteredProducts.length} items sorted by ${activeSort.replace(/-/g, " ")}`}
+                      </p>
+                  )}
+                </div>
+
+                {/* Featured card (full-width) */}
+                {featuredProduct && (
+                    <div className="reveal mb-6">
+                      <FeaturedCard product={featuredProduct} onViewClick={handleViewClick}/>
+                    </div>
+                )}
+
+                {/* Product grid */}
+                {gridProducts.length > 0 && (
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                      {gridProducts.map((p, i) => (
+                          <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
+                            <ProductCard product={p} onViewClick={handleViewClick}/>
+                          </div>
+                      ))}
+                    </div>
+                )}
+              </div>
+          )}
+        </main>
+
+        {/* ── FAQ ──────────────────────────────────── */}
+        <section className="px-edge pb-section">
           <div className="divider-thin mb-16" />
           <div className="reveal mb-12">
             <p className="section-marker mb-4">Questions</p>
@@ -606,14 +801,13 @@ export default function StorePage() {
                 key={i}
                 className={`reveal reveal-delay-${(i % 4) + 1} border-t border-white/[0.06] pt-6`}
               >
-                <h3 className="text-body-md font-medium text-bone mb-2">
-                  {faq.q}
-                </h3>
+                <h3 className="text-body-md font-medium text-bone mb-2">{faq.q}</h3>
                 <p className="text-body-sm text-ash leading-relaxed">{faq.a}</p>
               </div>
             ))}
           </div>
         </section>
+      </div>
 
       {/* Global Modals */}
       {selectedProduct && (

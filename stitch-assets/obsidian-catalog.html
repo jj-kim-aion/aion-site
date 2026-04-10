@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Store - The Obsidian Circuit</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&amp;family=Manrope:wght@400;500&amp;family=Space_Grotesk:wght@300;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+          rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "on-secondary-fixed-variant": "#574500",
+                        "surface-container-highest": "#353534",
+                        "on-tertiary-fixed-variant": "#474747",
+                        "inverse-surface": "#e5e2e1",
+                        "secondary": "#e9c349",
+                        "secondary-fixed-dim": "#e9c349",
+                        "on-tertiary": "#303030",
+                        "primary-container": "#001013",
+                        "primary": "#00daf3",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "outline-variant": "#444748",
+                        "secondary-container": "#af8d11",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary": "#3c2f00",
+                        "inverse-primary": "#006875",
+                        "surface": "#131313",
+                        "on-secondary-container": "#342800",
+                        "on-primary-fixed-variant": "#004f58",
+                        "primary-fixed-dim": "#00daf3",
+                        "on-surface-variant": "#c4c7c7",
+                        "tertiary-fixed": "#e4e2e1",
+                        "on-primary": "#00363d",
+                        "surface-tint": "#00daf3",
+                        "surface-bright": "#3a3939",
+                        "on-background": "#e5e2e1",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-on-surface": "#313030",
+                        "on-secondary-fixed": "#241a00",
+                        "tertiary-container": "#0d0d0d",
+                        "surface-container": "#201f1f",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary-fixed": "#ffe088",
+                        "outline": "#8e9192",
+                        "on-error": "#690005",
+                        "surface-variant": "#353534",
+                        "on-primary-container": "#008797",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary-container": "#7b7a7a",
+                        "on-primary-fixed": "#001f24",
+                        "tertiary": "#c8c6c5",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#9cf0ff",
+                        "error": "#ffb4ab",
+                        "background": "#131313"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(142, 145, 146, 0.1);
+        }
+
+        .metallic-glow-blue:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 218, 243, 0.15);
+            border-color: rgba(0, 218, 243, 0.3);
+        }
+
+        .metallic-glow-gold:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(233, 195, 73, 0.15);
+            border-color: rgba(233, 195, 73, 0.3);
+        }
+
+        .grid-bg {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0e0e0e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #353534;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-[#0e0e0e] text-on-surface font-body selection:bg-primary selection:text-on-primary min-h-screen">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-20 bg-[#0e0e0e]/80 backdrop-blur-md border-b border-outline-variant/10 font-['Inter']">
+    <div class="flex items-center gap-2">
+        <span class="text-[10px] tracking-[0.4em] text-on-surface-variant font-label uppercase opacity-50">// STORE</span>
+    </div>
+    <div class="hidden md:flex gap-10 items-center">
+        <a class="text-[#00daf3] font-label text-[11px] uppercase tracking-[0.2em] border-b border-[#00daf3] pb-1"
+           href="#">Curations</a>
+        <a class="text-on-surface-variant hover:text-[#00daf3] font-label text-[11px] uppercase tracking-[0.2em] transition-colors"
+           href="#">Hardware</a>
+        <a class="text-on-surface-variant hover:text-[#00daf3] font-label text-[11px] uppercase tracking-[0.2em] transition-colors"
+           href="#">Vault</a>
+        <a class="text-on-surface-variant hover:text-[#00daf3] font-label text-[11px] uppercase tracking-[0.2em] transition-colors"
+           href="#">Status</a>
+    </div>
+    <div class="flex items-center gap-6">
+        <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors text-xl"
+              data-icon="shopping_cart">shopping_cart</span>
+        <span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors text-xl"
+              data-icon="account_circle">account_circle</span>
+    </div>
+</nav>
+<!-- Main Content -->
+<main class="pt-20 px-6 md:px-12 lg:px-24 pb-24 grid-bg">
+    <!-- Hero Section -->
+    <header class="py-24 max-w-5xl">
+        <h1 class="font-headline text-5xl md:text-7xl font-extrabold tracking-tight text-on-surface leading-[1.1] mb-6">
+            The systems we run.<br/>
+            <span class="text-on-surface-variant/40">Packaged for you.</span>
+        </h1>
+        <p class="max-w-2xl text-on-surface-variant font-body text-lg md:text-xl leading-relaxed opacity-80">
+            Every product is a production-tested configuration from our live deployment. No demo-ware. No theory. These
+            are the actual files and playbooks running Mirai, JJ, and Chelsea right now.
+        </p>
+    </header>
+    <!-- Search and Filters -->
+    <div class="mb-16 space-y-8">
+        <div class="relative max-w-4xl">
+            <span class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant"
+                  data-icon="search">search</span>
+            <input class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl py-5 pl-16 pr-6 text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all font-body"
+                   placeholder="Search 5 products, toolkits, playbooks..." type="text"/>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <button class="px-6 py-2 bg-on-surface text-surface-container-lowest font-label text-[10px] uppercase tracking-widest rounded-full transition-all">
+                All Products
+            </button>
+            <button class="px-6 py-2 bg-surface-container border border-outline-variant/20 text-on-surface-variant hover:text-on-surface font-label text-[10px] uppercase tracking-widest rounded-full transition-all">
+                Playbooks
+            </button>
+            <button class="px-6 py-2 bg-surface-container border border-outline-variant/20 text-on-surface-variant hover:text-on-surface font-label text-[10px] uppercase tracking-widest rounded-full transition-all">
+                Configurations
+            </button>
+            <button class="px-6 py-2 bg-surface-container border border-outline-variant/20 text-on-surface-variant hover:text-on-surface font-label text-[10px] uppercase tracking-widest rounded-full transition-all">
+                Toolkits
+            </button>
+            <button class="px-6 py-2 bg-surface-container border border-outline-variant/20 text-on-surface-variant hover:text-on-surface font-label text-[10px] uppercase tracking-widest rounded-full transition-all">
+                Bundles
+            </button>
+            <div class="ml-auto hidden lg:flex items-center gap-4">
+                <span class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Sort:</span>
+                <button class="px-6 py-2 bg-surface-container border border-outline-variant/20 text-on-surface font-label text-[10px] uppercase tracking-widest rounded-sm transition-all flex items-center gap-2">
+                    Default
+                    <span class="material-symbols-outlined text-xs"
+                          data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Bento Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Featured Bundle -->
+        <section
+                class="lg:col-span-12 group relative overflow-hidden rounded-2xl glass-card metallic-glow-gold transition-all duration-500 border-outline-variant/20">
+            <div class="grid md:grid-cols-2 gap-0">
+                <div class="relative h-80 md:h-auto overflow-hidden bg-black">
+                    <img alt="Neural Network Deployment"
+                         class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:scale-105 transition-transform duration-1000"
+                         src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAMvav8Ye4p5hy7zWuQyzlsXvKgCY5jDyqZIyFqx8ZF9JHoHMi3KLLyBc6-DsleWhCVpr2H5hXxgfOfQXIy4xG8ldW9pi0oQT_WrKBzwVyOuNcLfYX-09W4eXD3LpwCPFcVADnevSSw0tYNtkL-Tngp0clSlTPwPvAnJT5xAF-0-zHmcaOWX6AQ6JYbepW5yHgLP4a63Q07UltmLp7nwCo-hLj5RChagOtoLK_gMTJEr412KqLTikNyUm-kJxmxRUx2aQzkI1doiBV"/>
+                    <div class="absolute inset-0 bg-gradient-to-r from-[#0e0e0e] to-transparent"></div>
+                </div>
+                <div class="p-10 lg:p-16 flex flex-col justify-center relative z-10">
+                    <div class="inline-flex items-center px-3 py-1 bg-secondary/10 border border-secondary/20 rounded-full mb-6 w-fit">
+                        <span class="font-label text-[9px] uppercase tracking-widest text-secondary">PREMIUM COLLECTION</span>
+                    </div>
+                    <h2 class="font-headline text-4xl font-bold text-on-surface mb-6 uppercase tracking-tight">Full
+                        Deployment Bundle</h2>
+                    <p class="text-on-surface-variant mb-10 text-lg leading-relaxed opacity-70">The complete ecosystem
+                        architecture. Includes all core neural configurations, autonomous playbooks, and the flagship
+                        methodology used for live system governance.</p>
+                    <div class="flex items-center gap-10 mb-10">
+                        <div>
+                            <p class="font-label text-[9px] uppercase tracking-widest text-on-surface-variant mb-2">
+                                Acquisition</p>
+                            <p class="text-3xl font-headline font-bold text-secondary">$349</p>
+                        </div>
+                        <div class="h-10 w-[1px] bg-outline-variant/20"></div>
+                        <div>
+                            <p class="font-label text-[9px] uppercase tracking-widest text-on-surface-variant mb-2">
+                                Status</p>
+                            <p class="text-[11px] font-label text-primary uppercase tracking-widest">Active Link</p>
+                        </div>
+                    </div>
+                    <button class="w-full md:w-fit px-12 py-4 bg-secondary text-on-secondary-fixed font-label text-xs uppercase tracking-[0.2em] rounded-sm hover:brightness-110 transition-all">
+                        Acquire Module
+                    </button>
+                </div>
+            </div>
+        </section>
+        <!-- Grid Items -->
+        <!-- Product Card 1 -->
+        <article
+                class="lg:col-span-6 xl:col-span-3 group relative glass-card p-6 rounded-2xl metallic-glow-blue flex flex-col h-full border-outline-variant/10">
+            <div class="relative aspect-square mb-8 rounded-xl overflow-hidden bg-surface-container-lowest">
+                <img alt="Super-Agent AI Core"
+                     class="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuC47a6Z7wqYmtHGwJroRiUffDGxDAo7VTxfCNaMH0jO0Jd1w8GHwmAkXQ2jKzM1j_m0SBxXRm54m6tVbb65tF09uZU-pf3sdnK-Iwj7cWhzMFItGjgsRf8EpHI3qcoWsyrlTAEEMWexGUIYCPADoJ4UdEn9t4WY-p_5j1o4tqsY7udQ8jlaUmZTrmRu8iFMQVlAxc60P5qBJJfxFADLhZBj3sc9U6ZjLOCq5-UGqkSj_DgscnroeXXIiyqawSgTvr9tC9hLD8P2P9df"/>
+                <div class="absolute top-4 left-4">
+                    <span class="px-2 py-1 bg-primary/10 backdrop-blur-md border border-primary/20 rounded-md font-label text-[9px] uppercase tracking-widest text-primary">CORE</span>
+                </div>
+            </div>
+            <div class="flex-1 flex flex-col">
+                <h3 class="font-headline text-lg font-bold text-on-surface mb-3 uppercase tracking-tight">Super-Agent
+                    Playbook</h3>
+                <p class="text-sm text-on-surface-variant/70 mb-8 leading-relaxed">Master the core neural protocols for
+                    autonomous agency and system interaction.</p>
+                <div class="mt-auto flex items-end justify-between pt-6 border-t border-outline-variant/10">
+                    <div>
+                        <p class="font-label text-[8px] uppercase tracking-[0.2em] text-on-surface-variant mb-1">
+                            Transfer Unit</p>
+                        <p class="text-2xl font-headline font-bold text-on-surface">$1</p>
+                    </div>
+                    <button class="w-12 h-12 flex items-center justify-center bg-surface-container border border-outline-variant/20 text-on-surface hover:bg-primary hover:text-on-primary transition-all duration-300 rounded-lg">
+                        <span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </article>
+        <!-- Product Card 2 -->
+        <article
+                class="lg:col-span-6 xl:col-span-3 group relative glass-card p-6 rounded-2xl metallic-glow-blue flex flex-col h-full border-outline-variant/10">
+            <div class="relative aspect-square mb-8 rounded-xl overflow-hidden bg-surface-container-lowest">
+                <img alt="OpenClaw Hardware Interface"
+                     class="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtXIb4CvawrI7upqPE2tUURkRS7C5B9bAAcsQmsUa_Lz0wihW-U55lZdIWn05ZFCDlKGhy9ejGO3eK4IqUMt_b_VY2-tpzYmdzz5o3nuLd33rmoiteeMUJvDkqEWWANnzER9YRFVPD4TsYXJv4_ETXDAMGVzV8PEem8Vtx7dRd9OUqx1MLEUc6Gg7NH_5YaaqAUJ_yLf6_CH75PyDevOnwMKnsjQmp337CHI1kgfoKzCf1Oc3o9DX-KyUmT8virkymVwmsQLCVyoK-"/>
+                <div class="absolute top-4 left-4">
+                    <span class="px-2 py-1 bg-surface-container-highest/50 backdrop-blur-md border border-outline-variant/30 rounded-md font-label text-[9px] uppercase tracking-widest text-on-surface-variant">CONFIG</span>
+                </div>
+            </div>
+            <div class="flex-1 flex flex-col">
+                <h3 class="font-headline text-lg font-bold text-on-surface mb-3 uppercase tracking-tight">OpenClaw
+                    Starter Config</h3>
+                <p class="text-sm text-on-surface-variant/70 mb-8 leading-relaxed">Essential silicon-level foundations
+                    for low-latency agent hardware control.</p>
+                <div class="mt-auto flex items-end justify-between pt-6 border-t border-outline-variant/10">
+                    <div>
+                        <p class="font-label text-[8px] uppercase tracking-[0.2em] text-on-surface-variant mb-1">
+                            Transfer Unit</p>
+                        <p class="text-2xl font-headline font-bold text-on-surface">$79</p>
+                    </div>
+                    <button class="w-12 h-12 flex items-center justify-center bg-surface-container border border-outline-variant/20 text-on-surface hover:bg-primary hover:text-on-primary transition-all duration-300 rounded-lg">
+                        <span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </article>
+        <!-- Product Card 3 -->
+        <article
+                class="lg:col-span-6 xl:col-span-3 group relative glass-card p-6 rounded-2xl metallic-glow-gold flex flex-col h-full border-outline-variant/10">
+            <div class="relative aspect-square mb-8 rounded-xl overflow-hidden bg-surface-container-lowest">
+                <img alt="Multi-Agent Swarm"
+                     class="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNLcpmKOpMojuq_fkGfDjSn3_kYXewDT3B3288QajoGBzkIJ3s48ZzXPBERpJ6in-NkGOXv3RQlMVwlJkzfcxwrB0kyxBdLM7uvyGUvvCDZIAGSWJbHEV66maRoy176S_tOP-xiBAZQzMTjLkIhp8f7jISIfhboDIOK6crSnf8ON_U8-l747_bxXxZDU6RErI08dfLBsFU1glRAWV8xzzYKFqyEOLc3mGIp91niDJFbDNCTfMEkvw1T9F8KLowuFJaMFYIcyg9ZDSG"/>
+                <div class="absolute top-4 left-4">
+                    <span class="px-2 py-1 bg-secondary/10 backdrop-blur-md border border-secondary/20 rounded-md font-label text-[9px] uppercase tracking-widest text-secondary">POPULAR</span>
+                </div>
+            </div>
+            <div class="flex-1 flex flex-col">
+                <h3 class="font-headline text-lg font-bold text-on-surface mb-3 uppercase tracking-tight">Multi-Agent
+                    Pro Config</h3>
+                <p class="text-sm text-on-surface-variant/70 mb-8 leading-relaxed">Advanced swarm orchestration and
+                    telemetry for high-concurrency systems.</p>
+                <div class="mt-auto flex items-end justify-between pt-6 border-t border-outline-variant/10">
+                    <div>
+                        <p class="font-label text-[8px] uppercase tracking-[0.2em] text-on-surface-variant mb-1">
+                            Transfer Unit</p>
+                        <p class="text-2xl font-headline font-bold text-on-surface">$149</p>
+                    </div>
+                    <button class="w-12 h-12 flex items-center justify-center bg-surface-container border border-outline-variant/20 text-on-surface hover:bg-secondary hover:text-on-secondary transition-all duration-300 rounded-lg">
+                        <span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </article>
+        <!-- Product Card 4 -->
+        <article
+                class="lg:col-span-6 xl:col-span-3 group relative glass-card p-6 rounded-2xl metallic-glow-blue flex flex-col h-full border-outline-variant/10">
+            <div class="relative aspect-square mb-8 rounded-xl overflow-hidden bg-surface-container-lowest">
+                <img alt="Sentry Automation"
+                     class="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9vDGrp9gq-D4J5jk_4Tn9nNkShGcmhzoM-D9jQKpQ3IRqdS9PLhDn5hil0RSGoPJ1QC2rSKBzknkkHIaYIpE1Vbw1ax4Wkme97gQvjqhJR4c_Oed2Pw9PYAQX0oGvN2wWCkQuMQ7TjhZo5xH5MwJoGeQ6nn_9DSvm1mwNQJriYoHIxPZaxnuYWHrXDLkcLhFIr9fjcXGHJXIKiiNF1SkPcSBRqWJtntfKiR9GNEDPRDImk9ibotbU8pROulJ683b4OmPdMRoFZMBY"/>
+                <div class="absolute top-4 left-4">
+                    <span class="px-2 py-1 bg-surface-container-highest/50 backdrop-blur-md border border-outline-variant/30 rounded-md font-label text-[9px] uppercase tracking-widest text-on-surface-variant">TOOLKIT</span>
+                </div>
+            </div>
+            <div class="flex-1 flex flex-col">
+                <h3 class="font-headline text-lg font-bold text-on-surface mb-3 uppercase tracking-tight">Sentry
+                    Auto-Fix Pipeline</h3>
+                <p class="text-sm text-on-surface-variant/70 mb-8 leading-relaxed">Automated self-healing protocols for
+                    high-uptime autonomous circuits.</p>
+                <div class="mt-auto flex items-end justify-between pt-6 border-t border-outline-variant/10">
+                    <div>
+                        <p class="font-label text-[8px] uppercase tracking-[0.2em] text-on-surface-variant mb-1">
+                            Transfer Unit</p>
+                        <p class="text-2xl font-headline font-bold text-on-surface">$99</p>
+                    </div>
+                    <button class="w-12 h-12 flex items-center justify-center bg-surface-container border border-outline-variant/20 text-on-surface hover:bg-primary hover:text-on-primary transition-all duration-300 rounded-lg">
+                        <span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </article>
+    </div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-16 border-t border-outline-variant/10 bg-[#0e0e0e]">
+    <div class="max-w-7xl mx-auto px-8 flex flex-col items-center gap-10">
+        <div class="text-secondary font-black font-label text-xs uppercase tracking-[0.5em] opacity-80">THE OBSIDIAN
+            CIRCUIT
+        </div>
+        <div class="flex flex-wrap justify-center gap-12">
+            <a class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest hover:text-primary transition-colors"
+               href="#">Terms of Acquisition</a>
+            <a class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest hover:text-primary transition-colors"
+               href="#">Privacy Protocol</a>
+            <a class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest hover:text-primary transition-colors"
+               href="#">System Status</a>
+            <a class="text-on-surface-variant font-label text-[10px] uppercase tracking-widest hover:text-primary transition-colors"
+               href="#">Operator Manual</a>
+        </div>
+        <div class="h-[1px] w-24 bg-outline-variant/20"></div>
+        <p class="text-on-surface-variant/40 font-label text-[9px] uppercase tracking-[0.3em] text-center">
+            ENGINEERED FOR PRECISION. © 2024 OBSIDIAN CIRCUIT DATA SYSTEMS.
+        </p>
+    </div>
+</footer>
+</body>
+</html>
