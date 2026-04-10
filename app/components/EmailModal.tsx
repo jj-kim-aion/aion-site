@@ -58,6 +58,7 @@ export function EmailModal({
     setLoading(true);
 
     try {
+      localStorage.setItem("last_purchased_id", productId);
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
