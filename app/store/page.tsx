@@ -97,12 +97,182 @@ function StatusNotification() {
   );
 }
 
+function ProductModal({
+                        product,
+                        isOpen,
+                        onClose,
+                        onBuyClick
+                      }: {
+  product: Product;
+  isOpen: boolean;
+  onClose: () => void;
+  onBuyClick: (product: Product) => void;
+}) {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const categoryLabels: Record<string, string> = {
+    playbook: "Playbook",
+    config: "Configuration",
+    toolkit: "Toolkit",
+    bundle: "Bundle",
+  };
+
+  const categoryLabel = categoryLabels[product.category] || "Product";
+
+  return (
+      <div
+          className="fixed inset-0 z-[80] flex items-center justify-center p-4 md:p-8"
+          onClick={onClose}
+      >
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-md animate-in fade-in duration-300"/>
+
+        {/* Modal */}
+        <div
+            className="relative bg-carbon border border-white/[0.08] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-300"
+            onClick={(e) => e.stopPropagation()}
+        >
+        {/* Header */}
+          <div
+              className="flex items-center justify-between p-6 border-b border-white/[0.04] bg-void/50 backdrop-blur-sm sticky top-0 z-10">
+            <div className="flex items-center gap-4">
+            <span
+                className="font-mono text-[0.65rem] uppercase tracking-widest text-ash px-2 py-1 rounded bg-white/5 border border-white/10">
+              {categoryLabel}
+            </span>
+              {product.badge && (
+                  <span
+                      className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/20 px-3 py-1 rounded-full">
+                {product.badge}
+              </span>
+              )}
+            </div>
+            <button
+                onClick={onClose}
+                className="text-ash/60 hover:text-bone transition-colors p-2 hover:bg-white/5 rounded-full"
+                aria-label="Close"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                   strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+        </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar">
+            <div className="grid lg:grid-cols-[1.5fr,1fr] gap-12">
+              <div>
+                <h2 className="text-display-md font-light mb-6">{product.name}</h2>
+                <p className="text-body-lg text-bone/90 leading-relaxed mb-8 font-medium">
+                  {product.product_summary}
+                </p>
+
+                <div className="prose prose-invert max-w-none">
+                  <p className="text-ash leading-relaxed whitespace-pre-wrap">
+                    {product.detailed_description}
+                  </p>
+              </div>
+              </div>
+
+              <div className="space-y-10">
+                {/* Features */}
+                <div>
+                  <p className="font-mono text-caption text-ash uppercase tracking-widest mb-4 border-b border-white/5 pb-2">
+                    Key Features
+                  </p>
+                  <div className="space-y-3">
+                    {product.features.map((f, i) => (
+                        <div key={i} className="flex items-start gap-3 group">
+                          <span
+                              className="text-mirai-glow mt-1 text-xs shrink-0 group-hover:scale-125 transition-transform duration-300">◆</span>
+                          <span className="text-body-sm text-ash/90 leading-snug">{f}</span>
+                        </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Deliverables */}
+                <div>
+                  <p className="font-mono text-caption text-ash uppercase tracking-widest mb-4 border-b border-white/5 pb-2">
+                    Technical Deliverables
+                  </p>
+                  <div className="space-y-3">
+                    {product.deliverables.map((d, i) => (
+                        <div key={i} className="flex items-start gap-3">
+                          <span className="text-mirai-glow/70 mt-1 text-xs shrink-0">→</span>
+                          <span className="text-body-sm text-ash/80 leading-snug font-mono">{d}</span>
+                        </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+
+          {/* Footer */}
+          <div
+              className="p-6 border-t border-white/[0.04] bg-void/50 backdrop-blur-sm flex flex-col sm:flex-row items-center justify-between gap-6 sticky bottom-0">
+            <div className="flex items-baseline gap-3">
+            <span className="text-display-sm font-light text-bone">
+              ${product.price}
+            </span>
+              {product.original_price && (
+                  <span className="text-body-md text-ash/50 line-through">
+                ${product.original_price}
+              </span>
+              )}
+            </div>
+            <button
+                className="btn-primary w-full sm:w-auto px-12 py-4 text-sm group relative overflow-hidden"
+                onClick={() => onBuyClick(product)}
+            >
+            <span className="relative z-10 flex items-center gap-2">
+              <span>{product.cta}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                   strokeLinecap="round" strokeLinejoin="round"
+                   className="group-hover:translate-x-1 transition-transform">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </span>
+            </button>
+          </div>
+        </div>
+      </div>
+  );
+}
+
 function ProductCard({
-                         product,
-                         onDownloadClick
+                       product,
+                       onViewClick
                      }: {
   product: Product;
-  onDownloadClick: (product: Product) => void;
+  onViewClick: (product: Product) => void;
 }) {
   const downloadRoute = DOWNLOAD_ROUTES[product.product_id];
 
@@ -124,96 +294,55 @@ function ProductCard({
   const accentClass = accentTopClass[product.category] || "accent-top-mirai";
 
   return (
-    <>
       <div
           id={product.product_id}
-          className={`rounded-xl bg-carbon p-8 md:p-10 flex flex-col h-full relative ring-1 ring-white/5 hover:bg-graphite hover:ring-white/10 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] group overflow-hidden ${accentClass}`}
+          className={`rounded-xl bg-carbon p-6 flex flex-col relative ring-1 ring-white/5 hover:bg-graphite hover:ring-white/10 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] group overflow-hidden w-full max-w-[320px] min-h-[360px] ${accentClass}`}
       >
         {/* Subtle glass effect gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none"/>
+
         {/* Header */}
-        <div className="flex items-start justify-between mb-6">
-          <span className="font-mono text-caption text-ash uppercase">
-            {categoryLabel}
-          </span>
+        <div className="flex items-start justify-between mb-4">
+        <span className="font-mono text-[0.6rem] text-ash/60 uppercase tracking-widest">
+          {categoryLabel}
+        </span>
           {product.badge && (
               <span
-                  className="font-mono text-[0.65rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/20 px-3 py-1 rounded-full backdrop-blur-sm">
-              {product.badge}
-            </span>
+                  className="font-mono text-[0.55rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/20 px-2 py-0.5 rounded-full backdrop-blur-sm">
+            {product.badge}
+          </span>
           )}
         </div>
 
         {/* Title */}
-        <h3 className="text-display-sm font-light mb-4">{product.name}</h3>
+        <h3 className="text-xl font-light mb-3 text-bone group-hover:text-white transition-colors min-h-[3.5rem] flex items-center">{product.name}</h3>
 
-        {/* Description */}
-        <p className="text-body-sm text-ash leading-relaxed mb-8">
+        {/* Description - Brief summary */}
+        <p className="text-body-sm text-ash/80 leading-relaxed mb-6">
           {product.product_summary}
         </p>
 
-        {/* Features */}
-        <div className="mb-8 flex-1">
-          <p className="font-mono text-caption text-ash/60 uppercase mb-3">
-            Includes
-          </p>
-          <div className="space-y-2">
-            {product.features.slice(0, 6).map((f, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className="text-mirai-glow/50 mt-1 text-xs">◆</span>
-                <span className="text-body-sm text-ash/80">{f}</span>
-              </div>
-            ))}
-            {product.features.length > 6 && (
-              <p className="text-body-sm text-ash/50 pl-5">
-                + {product.features.length - 6} more
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Deliverables */}
-        <div className="mb-8">
-          <p className="font-mono text-caption text-ash/60 uppercase mb-3">
-            You receive
-          </p>
-          <div className="space-y-1.5">
-            {product.deliverables.slice(0, 4).map((d, i) => (
-              <p key={i} className="text-body-sm text-ash/70">
-                → {d}
-              </p>
-            ))}
-            {product.deliverables.length > 4 && (
-              <p className="text-body-sm text-ash/50">
-                + {product.deliverables.length - 4} more items
-              </p>
-            )}
-          </div>
-        </div>
-
         {/* Price + CTA */}
-        <div className="border-t border-white/[0.04] pt-6 mt-auto">
-          <div className="flex items-end justify-between">
-            <div>
-              <span className="text-display-sm font-light text-bone">
-                ${product.price}
-              </span>
-              {product.original_price && (
-                <span className="text-body-sm text-ash/50 line-through ml-3">
-                  ${product.original_price}
-                </span>
-              )}
-            </div>
-            <button
-              className="btn-primary text-[0.75rem] py-3 px-6"
-              onClick={() => onDownloadClick(product)}
-            >
-              <span>{product.cta}</span>
-            </button>
+        <div className="mt-auto pt-4 flex items-center justify-between border-t border-white/[0.04]">
+          <div className="flex items-baseline gap-2">
+          <span className="text-lg font-light text-bone">
+            ${product.price}
+          </span>
           </div>
+          <button
+              className="text-[0.7rem] font-mono uppercase tracking-[0.2em] text-mirai-glow hover:text-white transition-colors flex items-center gap-2 group/btn"
+              onClick={() => onViewClick(product)}
+          >
+            <span>View & Buy</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                 strokeLinecap="round" strokeLinejoin="round"
+                 className="group-hover/btn:translate-x-1 transition-transform">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
         </div>
       </div>
-    </>
   );
 }
 
@@ -239,6 +368,7 @@ export default function StorePage() {
   }, [activeFilter, activeSort, searchQuery]);
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showProductModal, setShowProductModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
 
   useEffect(() => {
@@ -268,6 +398,17 @@ export default function StorePage() {
       setLoading(false);
     });
   }, []);
+
+  function handleViewClick(product: Product) {
+    setSelectedProduct(product);
+    setShowProductModal(true);
+  }
+
+  function handleBuyClick(product: Product) {
+    setShowProductModal(false);
+    setSelectedProduct(product);
+    setShowEmailModal(true);
+  }
 
   function handleDownloadClick(product: Product) {
     setSelectedProduct(product);
@@ -299,21 +440,6 @@ export default function StorePage() {
     firstProduct: filteredProducts[0]?.name
   });
 
-  const flagship = filteredProducts.filter((p) => p.category === "playbook");
-  const configs = filteredProducts.filter((p) => p.category === "config");
-  const toolkits = filteredProducts.filter((p) => p.category === "toolkit");
-  const bundles = filteredProducts.filter((p) => p.category === "bundle");
-
-  const unclassified = filteredProducts.filter((p) => !["playbook", "config", "toolkit", "bundle"].includes(p.category));
-
-  console.log("StorePage: Categories counts:", {
-    flagship: flagship.length,
-    configs: configs.length,
-    toolkits: toolkits.length,
-    bundles: bundles.length,
-    unclassified: unclassified.length
-  });
-  
   const hasResults = filteredProducts.length > 0;
 
   if (loading) {
@@ -415,119 +541,34 @@ export default function StorePage() {
         </section>
       )}
 
-      {/* ── SEARCH RESULTS (UNIFIED) ─────── */}
-      {(searchQuery || activeSort !== "default") && hasResults && (
+      {/* ── PRODUCT GRID (UNIFIED) ─────── */}
+      {hasResults && (
         <section className="px-edge pb-section">
           <div className="reveal mb-8">
             <p className="section-marker mb-2">
-              {searchQuery ? "Search Results" : "All Products"}
+              {searchQuery ? "Search Results" : activeFilter !== "all" ? `${activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1)}s` : "All Products"}
             </p>
-            <p className="text-ash text-sm">
-              {searchQuery 
-                ? `Showing ${filteredProducts.length} items for "${searchQuery}"`
-                : `Showing ${filteredProducts.length} items sorted by ${activeSort.replace(/-/g, ' ')}`
-              }
-            </p>
+            {(searchQuery || activeSort !== "default") && (
+                <p className="text-ash text-sm">
+                  {searchQuery
+                      ? `Showing ${filteredProducts.length} items for "${searchQuery}"`
+                      : `Showing ${filteredProducts.length} items sorted by ${activeSort.replace(/-/g, ' ')}`
+                  }
+                </p>
+            )}
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((p, i) => (
                 <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
-                <ProductCard product={p} onDownloadClick={handleDownloadClick} />
-              </div>
+                  <ProductCard product={p} onViewClick={handleViewClick}/>
+                </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* ── GROUPED VIEW (ONLY IF NO SEARCH AND NO SORT) ── */}
-      {!searchQuery && activeSort === "default" && (
-        <>
-          {/* ── FLAGSHIP ──────────────────── */}
-          {flagship.length > 0 && (
-            <section className="px-edge pb-section">
-              <div className="reveal mb-8">
-                <p className="section-marker mb-2">Flagship</p>
-              </div>
-              <div className="reveal reveal-delay-1">
-                {flagship.map((p) => (
-                    <ProductCard key={p.product_id} product={p} onDownloadClick={handleDownloadClick}/>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ── CONFIGURATIONS ────────────── */}
-          {configs.length > 0 && (
-            <section className="px-edge pb-section">
-              {flagship.length > 0 && <div className="divider-thin mb-16" />}
-              <div className="reveal mb-8">
-                <p className="section-marker mb-2">Configurations</p>
-              </div>
-              <div className="grid md:grid-cols-2 gap-6">
-                {configs.map((p, i) => (
-                    <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
-                    <ProductCard product={p} onDownloadClick={handleDownloadClick} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ── TOOLKITS ──────────────────── */}
-          {toolkits.length > 0 && (
-            <section className="px-edge pb-section">
-              {(flagship.length > 0 || configs.length > 0) && <div className="divider-thin mb-16" />}
-              <div className="reveal mb-8">
-                <p className="section-marker mb-2">Toolkits</p>
-              </div>
-              <div className="grid md:grid-cols-2 gap-6">
-                {toolkits.map((p, i) => (
-                    <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
-                    <ProductCard product={p} onDownloadClick={handleDownloadClick} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ── BUNDLE ────────────────────── */}
-          {bundles.length > 0 && (
-            <section className="px-edge pb-section">
-              {(flagship.length > 0 || configs.length > 0 || toolkits.length > 0) && <div className="divider-glow mb-16" />}
-              <div className="reveal mb-8">
-                <p className="section-marker mb-2">The Full System</p>
-              </div>
-              <div className="reveal reveal-delay-1 max-w-3xl">
-                {bundles.map((p) => (
-                    <ProductCard key={p.product_id} product={p} onDownloadClick={handleDownloadClick}/>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ── UNCLASSIFIED ────────────────── */}
-          {unclassified.length > 0 && (
-              <section className="px-edge pb-section">
-                {(flagship.length > 0 || configs.length > 0 || toolkits.length > 0 || bundles.length > 0) &&
-                    <div className="divider-thin mb-16"/>}
-                <div className="reveal mb-8">
-                  <p className="section-marker mb-2">Other Products</p>
-                </div>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {unclassified.map((p, i) => (
-                      <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
-                        <ProductCard product={p} onDownloadClick={handleDownloadClick}/>
-                      </div>
-                  ))}
-                </div>
-              </section>
-          )}
-        </>
-      )}
-
-      {/* ── FAQ (ONLY IF NO SEARCH AND NO SORT) ─────── */}
-      {!searchQuery && activeSort === "default" && (
-        <section className="px-edge pb-section">
+      {/* ── FAQ ─────── */}
+      <section className="px-edge pb-section">
           <div className="divider-thin mb-16" />
           <div className="reveal mb-12">
             <p className="section-marker mb-4">Questions</p>
@@ -573,16 +614,23 @@ export default function StorePage() {
             ))}
           </div>
         </section>
-      )}
 
-      {/* Global Email Modal */}
+      {/* Global Modals */}
       {selectedProduct && (
-        <EmailModal
-          isOpen={showEmailModal}
-          onClose={() => setShowEmailModal(false)}
-          productId={selectedProduct.id}
-          productName={selectedProduct.name}
-        />
+          <>
+            <ProductModal
+                isOpen={showProductModal}
+                onClose={() => setShowProductModal(false)}
+                product={selectedProduct}
+                onBuyClick={handleBuyClick}
+            />
+            <EmailModal
+                isOpen={showEmailModal}
+                onClose={() => setShowEmailModal(false)}
+                productId={selectedProduct.id}
+                productName={selectedProduct.name}
+            />
+          </>
       )}
     </div>
   );
