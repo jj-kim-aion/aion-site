@@ -1,10 +1,10 @@
 "use client";
 
-import {Suspense, useState} from "react";
-import {useSearchParams} from "next/navigation";
-import {useReveal} from "@/lib/useReveal";
-import {PRODUCTS} from "@/lib/data";
-import {EmailModal} from "@/app/components/EmailModal";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useReveal } from "@/lib/useReveal";
+import { getProducts, Product } from "@/lib/data";
+import { EmailModal } from "@/app/components/EmailModal";
 
 /** Map product IDs to their download API routes */
 const DOWNLOAD_ROUTES: Record<string, string> = {
@@ -101,10 +101,10 @@ function ProductCard({
                          product,
                          onDownloadClick
                      }: {
-  product: (typeof PRODUCTS)[number];
-  onDownloadClick: (product: (typeof PRODUCTS)[number]) => void;
+  product: Product;
+  onDownloadClick: (product: Product) => void;
 }) {
-  const downloadRoute = DOWNLOAD_ROUTES[product.id];
+  const downloadRoute = DOWNLOAD_ROUTES[product.product_id];
 
   const categoryLabels: Record<string, string> = {
     playbook: "Playbook",
@@ -113,25 +113,28 @@ function ProductCard({
     bundle: "Bundle",
   };
 
-    const accentTopClass: Record<string, string> = {
-        playbook: "accent-top-mirai",
-        config: "accent-top-jj",
-        toolkit: "accent-top-chelsea",
-        bundle: "accent-top-mirai",
-    };
+  const accentTopClass: Record<string, string> = {
+    playbook: "accent-top-mirai",
+    config: "accent-top-jj",
+    toolkit: "accent-top-chelsea",
+    bundle: "accent-top-mirai",
+  };
+
+  const categoryLabel = categoryLabels[product.category] || "Product";
+  const accentClass = accentTopClass[product.category] || "accent-top-mirai";
 
   return (
     <>
       <div
-        id={product.id}
-        className={`rounded-xl bg-carbon p-8 md:p-10 flex flex-col h-full relative ring-1 ring-white/5 hover:bg-graphite hover:ring-white/10 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] group overflow-hidden ${accentTopClass[product.category]}`}
+          id={product.product_id}
+          className={`rounded-xl bg-carbon p-8 md:p-10 flex flex-col h-full relative ring-1 ring-white/5 hover:bg-graphite hover:ring-white/10 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] group overflow-hidden ${accentClass}`}
       >
         {/* Subtle glass effect gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none" />
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <span className="font-mono text-caption text-ash uppercase">
-            {categoryLabels[product.category]}
+            {categoryLabel}
           </span>
           {product.badge && (
               <span
@@ -146,7 +149,7 @@ function ProductCard({
 
         {/* Description */}
         <p className="text-body-sm text-ash leading-relaxed mb-8">
-          {product.description}
+          {product.product_summary}
         </p>
 
         {/* Features */}
@@ -195,15 +198,15 @@ function ProductCard({
               <span className="text-display-sm font-light text-bone">
                 ${product.price}
               </span>
-              {product.originalPrice && (
+              {product.original_price && (
                 <span className="text-body-sm text-ash/50 line-through ml-3">
-                  ${product.originalPrice}
+                  ${product.original_price}
                 </span>
               )}
             </div>
             <button
               className="btn-primary text-[0.75rem] py-3 px-6"
-              onClick={downloadRoute ? () => onDownloadClick(product) : undefined}
+              onClick={() => onDownloadClick(product)}
             >
               <span>{product.cta}</span>
             </button>
@@ -216,19 +219,62 @@ function ProductCard({
 
 export default function StorePage() {
   const revealRef = useReveal();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [activeSort, setActiveSort] = useState("default");
 
-  const [selectedProduct, setSelectedProduct] = useState<(typeof PRODUCTS)[number] | null>(null);
+  useEffect(() => {
+    // When filters change, we need to ensure they are visible
+    // since the reveal animation might not trigger if they are already in viewport
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new Event('scroll'));
+      const hidden = document.querySelectorAll(".reveal:not(.visible)");
+      if (hidden.length > 0) {
+        hidden.forEach(el => el.classList.add("visible"));
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [activeFilter, activeSort, searchQuery]);
+
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
 
-  function handleDownloadClick(product: (typeof PRODUCTS)[number]) {
+  useEffect(() => {
+    console.log("StorePage: Fetching products...");
+    getProducts().then(data => {
+      console.log("StorePage: Received products:", data);
+      if (data && data.length > 0) {
+        setProducts(data);
+      } else {
+        console.warn("StorePage: No products returned from Supabase.");
+      }
+      setLoading(false);
+      // Force an extra check for reveal elements after state update
+      setTimeout(() => {
+        window.dispatchEvent(new Event('scroll'));
+        console.log("StorePage: Triggered scroll event for reveal animations.");
+
+        // Final fallback: just mark everything visible if it's still hidden
+        const hidden = document.querySelectorAll(".reveal:not(.visible)");
+        if (hidden.length > 0) {
+          console.log(`StorePage: Forcing visibility for ${hidden.length} elements.`);
+          hidden.forEach(el => el.classList.add("visible"));
+        }
+      }, 500); // Increased timeout to ensure DOM is fully ready
+    }).catch(err => {
+      console.error("StorePage: Error in useEffect:", err);
+      setLoading(false);
+    });
+  }, []);
+
+  function handleDownloadClick(product: Product) {
     setSelectedProduct(product);
     setShowEmailModal(true);
   }
 
-  const sortedProducts = [...PRODUCTS].sort((a, b) => {
+  const sortedProducts = [...products].sort((a, b) => {
     if (activeSort === "price-asc") return a.price - b.price;
     if (activeSort === "price-desc") return b.price - a.price;
     return 0;
@@ -236,19 +282,47 @@ export default function StorePage() {
 
   const filteredProducts = sortedProducts.filter((p) => {
     const query = searchQuery.toLowerCase();
-    const searchMatch = 
-      p.name.toLowerCase().includes(query);
+    const nameMatch = p.name.toLowerCase().includes(query);
+    const summaryMatch = p.product_summary.toLowerCase().includes(query);
+    const categoryMatch = p.category.toLowerCase().includes(query);
+    const searchMatch = nameMatch || summaryMatch || categoryMatch;
     
     if (activeFilter === "all") return searchMatch;
     return searchMatch && p.category === activeFilter;
+  });
+
+  console.log("StorePage: Filtered products count:", filteredProducts.length, {
+    total: products.length,
+    searchQuery,
+    activeFilter,
+    activeSort,
+    firstProduct: filteredProducts[0]?.name
   });
 
   const flagship = filteredProducts.filter((p) => p.category === "playbook");
   const configs = filteredProducts.filter((p) => p.category === "config");
   const toolkits = filteredProducts.filter((p) => p.category === "toolkit");
   const bundles = filteredProducts.filter((p) => p.category === "bundle");
+
+  const unclassified = filteredProducts.filter((p) => !["playbook", "config", "toolkit", "bundle"].includes(p.category));
+
+  console.log("StorePage: Categories counts:", {
+    flagship: flagship.length,
+    configs: configs.length,
+    toolkits: toolkits.length,
+    bundles: bundles.length,
+    unclassified: unclassified.length
+  });
   
   const hasResults = filteredProducts.length > 0;
+
+  if (loading) {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-void">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-mirai-glow"/>
+        </div>
+    );
+  }
 
   return (
     <div ref={revealRef}>
@@ -285,7 +359,7 @@ export default function StorePage() {
             </div>
             <input
               type="text"
-              placeholder="Search products, toolkits, playbooks..."
+              placeholder={`Search ${products.length} products, toolkits, playbooks...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-carbon/50 hover:bg-carbon text-bone focus:outline-none ring-1 ring-white/10 focus:ring-mirai-glow/80 focus:bg-carbon pl-14 pr-6 py-4 rounded-xl transition-all font-body text-body-md shadow-inner"
@@ -357,7 +431,7 @@ export default function StorePage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts.map((p, i) => (
-              <div key={p.id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
+                <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
                 <ProductCard product={p} onDownloadClick={handleDownloadClick} />
               </div>
             ))}
@@ -376,7 +450,7 @@ export default function StorePage() {
               </div>
               <div className="reveal reveal-delay-1">
                 {flagship.map((p) => (
-                  <ProductCard key={p.id} product={p} onDownloadClick={handleDownloadClick} />
+                    <ProductCard key={p.product_id} product={p} onDownloadClick={handleDownloadClick}/>
                 ))}
               </div>
             </section>
@@ -391,7 +465,7 @@ export default function StorePage() {
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {configs.map((p, i) => (
-                  <div key={p.id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
+                    <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
                     <ProductCard product={p} onDownloadClick={handleDownloadClick} />
                   </div>
                 ))}
@@ -408,7 +482,7 @@ export default function StorePage() {
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {toolkits.map((p, i) => (
-                  <div key={p.id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
+                    <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
                     <ProductCard product={p} onDownloadClick={handleDownloadClick} />
                   </div>
                 ))}
@@ -425,10 +499,28 @@ export default function StorePage() {
               </div>
               <div className="reveal reveal-delay-1 max-w-3xl">
                 {bundles.map((p) => (
-                  <ProductCard key={p.id} product={p} onDownloadClick={handleDownloadClick} />
+                    <ProductCard key={p.product_id} product={p} onDownloadClick={handleDownloadClick}/>
                 ))}
               </div>
             </section>
+          )}
+
+          {/* ── UNCLASSIFIED ────────────────── */}
+          {unclassified.length > 0 && (
+              <section className="px-edge pb-section">
+                {(flagship.length > 0 || configs.length > 0 || toolkits.length > 0 || bundles.length > 0) &&
+                    <div className="divider-thin mb-16"/>}
+                <div className="reveal mb-8">
+                  <p className="section-marker mb-2">Other Products</p>
+                </div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {unclassified.map((p, i) => (
+                      <div key={p.product_id} className={`reveal reveal-delay-${(i % 4) + 1}`}>
+                        <ProductCard product={p} onDownloadClick={handleDownloadClick}/>
+                      </div>
+                  ))}
+                </div>
+              </section>
           )}
         </>
       )}

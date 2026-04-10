@@ -1,7 +1,8 @@
 export function getDownloadEmailHTML(
   productName: string,
   downloadUrl: string,
-  recipientEmail: string
+  recipientEmail: string,
+  orderId: string
 ): string {
   return `
 <!DOCTYPE html>
@@ -36,6 +37,10 @@ export function getDownloadEmailHTML(
                 Your Download is Ready
               </h2>
               
+              <div style="margin-bottom: 24px; font-size: 14px; color: #737373;">
+                Order ID: <strong style="color: #a3a3a3; font-family: 'Courier New', monospace;">${orderId}</strong>
+              </div>
+
               <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #a3a3a3;">
                 Thanks for your interest in <strong style="color: #e5e5e5;">${productName}</strong>. 
                 Click the button below to download your copy.
@@ -106,7 +111,8 @@ export function getDownloadEmailHTML(
 export function getDownloadEmailText(
   productName: string,
   downloadUrl: string,
-  recipientEmail: string
+  recipientEmail: string,
+  orderId: string
 ): string {
   const expiryTime = new Date(Date.now() + 6 * 60 * 60 * 1000).toLocaleString('en-US', {
     timeZone: 'UTC',
@@ -124,6 +130,8 @@ Building Super Agents
 ────────────────────────────────
 
 Your Download is Ready
+
+Order ID: ${orderId}
 
 Thanks for your interest in ${productName}. 
 Your secure download link is below.

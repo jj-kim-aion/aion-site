@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface EmailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  productId: string;
+  productId?: number;
   productName: string;
 }
 
@@ -58,7 +58,7 @@ export function EmailModal({
     setLoading(true);
 
     try {
-      localStorage.setItem("last_purchased_id", productId);
+      localStorage.setItem("last_purchased_id", productId?.toString() || "");
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { PRODUCTS, Product } from "@/lib/data";
+import { getProducts, Product } from "@/lib/data";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -14,33 +14,53 @@ function SuccessContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, we might fetch session details from Stripe here
-    // For now, we'll try to infer or just show a default success state
-    // We can also store the last purchased ID in localStorage during checkout
-    const lastPurchasedId = localStorage.getItem("last_purchased_id");
-    
-    const product = PRODUCTS.find(p => p.id === lastPurchasedId) || PRODUCTS[0];
-    setPurchasedProduct(product);
+    async function fetchProducts() {
+      try {
+        const products = await getProducts();
+        if (!products || products.length === 0) {
+          setLoading(false);
+          return;
+        }
 
-    // Contextual Upsell Logic
-    // 1. If bought Playbook -> Upsell Multi-Agent Pro Config
-    // 2. If bought Starter Config -> Upsell Multi-Agent Pro Config
-    // 3. If bought Pro Config -> Upsell Sentry Pipeline Kit
-    // 4. Default -> Upsell Playbook (if not bought)
-    
-    let upsell: Product | null = null;
-    if (product.id === "super-agent-playbook") {
-      upsell = PRODUCTS.find(p => p.id === "multi-agent-pro-config") || null;
-    } else if (product.id === "openclaw-starter-config") {
-      upsell = PRODUCTS.find(p => p.id === "multi-agent-pro-config") || null;
-    } else if (product.id === "multi-agent-pro-config") {
-      upsell = PRODUCTS.find(p => p.id === "sentry-pipeline-kit") || null;
-    } else {
-      upsell = PRODUCTS.find(p => p.id === "super-agent-playbook") || null;
+        const lastPurchasedId = localStorage.getItem("last_purchased_id");
+
+        // Find by internal ID (number)
+        const product = products.find(p => p.id.toString() === lastPurchasedId) || products[0];
+        setPurchasedProduct(product);
+
+        // Contextual Upsell Logic
+        // 1. If bought Playbook -> Upsell Multi-Agent Pro Config
+        // 2. If bought Starter Config -> Upsell Multi-Agent Pro Config
+        // 3. If bought Pro Config -> Upsell Sentry Pipeline Kit
+        // 4. Default -> Upsell Playbook (if not bought)
+
+        let upsell: Product | null = null;
+        if (product.product_id === "super-agent-playbook") {
+          upsell = products.find(p => p.product_id === "multi-agent-pro-config") || null;
+        } else if (product.product_id === "openclaw-starter-config") {
+          upsell = products.find(p => p.product_id === "multi-agent-pro-config") || null;
+        } else if (product.product_id === "multi-agent-pro-config") {
+          upsell = products.find(p => p.product_id === "sentry-pipeline-kit") || null;
+        } else {
+          // Default: try to upsell the playbook if they didn't buy it, 
+          // but if they just bought the full bundle, don't upsell the playbook
+          if (product.product_id !== "super-agent-playbook" && product.product_id !== "full-deployment-bundle") {
+            upsell = products.find(p => p.product_id === "super-agent-playbook") || null;
+          } else if (product.product_id === "full-deployment-bundle") {
+            // If they bought the bundle, they have everything. Maybe no upsell or a specific one?
+            upsell = null;
+          }
+        }
+
+        setUpsellProduct(upsell);
+      } catch (error) {
+        console.error("Error fetching products for success page:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-    
-    setUpsellProduct(upsell);
-    setLoading(false);
+
+    fetchProducts();
   }, []);
 
   if (loading) {
@@ -120,7 +140,7 @@ function SuccessContent() {
                   {upsellProduct.name}
                 </h3>
                 <p className="text-body-sm text-ash mb-8 leading-relaxed">
-                  {upsellProduct.description}
+                  {upsellProduct.product_summary}
                 </p>
                 <Link 
                   href="/store" 
