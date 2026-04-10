@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       ],
       mode: "payment",
       customer_email: email,
-      success_url: `${baseUrl}/store?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/store?canceled=true`,
       metadata: {
         email,
