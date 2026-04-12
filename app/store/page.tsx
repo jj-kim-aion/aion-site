@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { useReveal } from "@/lib/useReveal";
-import { getProducts, Product } from "@/lib/data";
-import { EmailModal } from "@/app/components/EmailModal";
+import {Suspense, useEffect, useState} from "react";
+import {useSearchParams} from "next/navigation";
+import {useReveal} from "@/lib/useReveal";
+import {getProducts, Product} from "@/lib/data";
+import {EmailModal} from "@/app/components/EmailModal";
 
 /** Map product IDs to their download API routes */
 const DOWNLOAD_ROUTES: Record<string, string> = {
@@ -485,7 +485,7 @@ export default function StorePage() {
             </div>
             <input
               type="text"
-              placeholder={`Search ${products.length} products, toolkits, playbooks...`}
+              placeholder={`Search products, toolkits, playbooks...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-carbon/50 hover:bg-carbon text-bone focus:outline-none ring-1 ring-white/10 focus:ring-mirai-glow/80 focus:bg-carbon pl-14 pr-6 py-4 rounded-xl transition-all font-body text-body-md shadow-inner"

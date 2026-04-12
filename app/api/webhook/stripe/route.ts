@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
-import { Resend } from "resend";
-import { createDownloadToken, createOrder, generateOrderId } from "@/lib/orders";
-import { getDownloadEmailHTML, getDownloadEmailText } from "@/lib/email-template";
-import { getProductByInternalId } from "@/lib/data";
-import { supabase } from "@/lib/supabase";
+import {NextRequest, NextResponse} from "next/server";
+import {stripe} from "@/lib/stripe";
+import {Resend} from "resend";
+import {createDownloadToken, createOrder, generateOrderId} from "@/lib/orders";
+import {getDownloadEmailHTML, getDownloadEmailText} from "@/lib/email-template";
+import {getProductByInternalId} from "@/lib/data";
+import {supabase} from "@/lib/supabase";
 import Stripe from "stripe";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
         customer_email: email,
         product_id: product.product_id,
         product_ref_id: product.id, // Use the bigint ID for fast joins
-        amount_total: session.amount_total || 0,
+        amount_total: session.amount_total ? (session.amount_total / 100) : 0,
         currency: session.currency || "usd",
         status: "completed",
       });
