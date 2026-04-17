@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+import type {Metadata} from "next";
 import "./globals.css";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import {Navigation} from "@/components/Navigation";
+import {Footer} from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Aion Labs — Autonomous Intelligence. Engineered.",
@@ -12,6 +12,13 @@ export const metadata: Metadata = {
     description:
       "We build AI super-agents that run businesses. Three autonomous agents. One unified system. Zero busywork.",
     type: "website",
+  },
+  icons: {
+    icon: [
+      {url: "/icon.svg", type: "image/svg+xml"},
+      {url: "/favicon.ico", sizes: "any"},
+    ],
+    apple: "/icon.svg",
   },
 };
 
