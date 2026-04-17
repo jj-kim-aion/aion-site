@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAndConsumeToken } from "@/lib/orders";
+import { Resend } from "resend";
+import { getFollowupEmailHTML, getFollowupEmailText } from "@/lib/email-template";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const BLOB_URL =
   "https://idvgrnhe5bv9ai1w.public.blob.vercel-storage.com/1-eBook-Building-Super-Agents.md.pdf";
@@ -54,10 +58,33 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Log successful download for analytics
     console.log(
         `✅ Download authorized | Email: ${tokenData.customer_email} | Product: ${tokenData.product_id} | Token consumed: ${token.substring(0, 8)}...`
     );
+
+    // Schedule follow-up email (2 days later)
+    try {
+      const productName = "Building Super Agents Playbook";
+      console.log(`📅 Scheduling follow-up email for ${tokenData.customer_email} in 2 days...`);
+      
+      const { data: followData, error: followError } = await resend.emails.send({
+        from: "Aion Research <research@aionlabs.io>",
+        to: [tokenData.customer_email],
+        subject: `Checking in: ${productName}`,
+        html: getFollowupEmailHTML(productName, tokenData.customer_email),
+        text: getFollowupEmailText(productName, tokenData.customer_email),
+        scheduledAt: "in 2 days",
+      });
+
+      if (followError) {
+        console.error("❌ Failed to schedule follow-up email:", followError);
+      } else {
+        console.log(`✅ Follow-up email scheduled successfully | Resend ID: ${followData?.id}`);
+      }
+    } catch (followupError) {
+      console.error("❌ Unexpected error scheduling follow-up:", followupError);
+      // We don't fail the download if the follow-up scheduling fails
+    }
 
     // Fetch PDF from blob storage
     console.log(`📥 Fetching PDF from blob storage...`);
