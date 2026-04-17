@@ -200,7 +200,7 @@ export default function Home() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-16">
           {HOMEPAGE.metrics.items.map((metric, i) => (
             <div key={i} className={`reveal reveal-delay-${i + 1}`}>
-                <p className="text-display-md font-light text-gradient-gold mb-2 metric-value">
+                <p className="text-display-md font-normal text-gradient-gold mb-2 metric-value">
                 {metric.value}
               </p>
               <p className="font-mono text-caption text-ash">
@@ -215,7 +215,7 @@ export default function Home() {
           CTA SECTION
           ═══════════════════════════════════ */}
       <section className="py-section px-edge">
-          <div className="relative rounded-architectural cta-card p-12 md:p-20">
+          <div className="relative cta-card p-12 md:p-20">
           {/* Glow */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-mirai-glow/[0.04] blur-[150px] pointer-events-none" />
 

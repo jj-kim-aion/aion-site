@@ -296,47 +296,45 @@ function ProductCard({
   return (
       <div
           id={product.product_id}
-          className={`rounded-xl bg-carbon p-6 flex flex-col relative ring-1 ring-white/5 hover:bg-graphite hover:ring-white/10 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] group overflow-hidden w-full max-w-[320px] min-h-[360px] ${accentClass}`}
+          className={`metal-card rounded-2xl p-6 flex flex-col group w-full max-w-[320px] min-h-[360px] ${accentClass}`}
       >
-        {/* Subtle glass effect gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none"/>
-
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-4 relative z-10">
         <span className="font-mono text-[0.6rem] text-ash/60 uppercase tracking-widest">
           {categoryLabel}
         </span>
           {product.badge && (
               <span
-                  className="font-mono text-[0.55rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/20 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                  className="font-mono text-[0.55rem] uppercase tracking-[0.1em] text-mirai-glow border border-mirai-glow/25 px-2 py-0.5 rounded-full"
+                  style={{boxShadow: 'inset 0 1px 0 rgba(201,168,76,0.1)'}}>
             {product.badge}
           </span>
           )}
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-light mb-3 text-bone group-hover:text-white transition-colors min-h-[3.5rem] flex items-center">{product.name}</h3>
+        <h3 className="text-xl font-normal mb-3 text-bone group-hover:text-ivory transition-colors duration-300 min-h-[3.5rem] flex items-center relative z-10">{product.name}</h3>
 
         {/* Description - Brief summary */}
-        <p className="text-body-sm text-ash/80 leading-relaxed mb-6">
+        <p className="text-body-sm text-ash/80 leading-relaxed mb-6 relative z-10">
           {product.product_summary}
         </p>
 
         {/* Price + CTA */}
-        <div className="mt-auto pt-4 flex items-center justify-between border-t border-white/[0.04]">
+        <div className="mt-auto pt-4 flex items-center justify-between border-t border-white/[0.07] relative z-10">
           <div className="flex items-baseline gap-2">
-          <span className="text-lg font-light text-bone">
+          <span className="text-lg font-medium text-bone tabular-nums">
             ${product.price}
           </span>
           </div>
           <button
-              className="text-[0.7rem] font-mono uppercase tracking-[0.2em] text-mirai-glow hover:text-white transition-colors flex items-center gap-2 group/btn"
+              className="text-[0.7rem] font-mono uppercase tracking-[0.18em] text-mirai-glow hover:text-ivory transition-colors duration-200 flex items-center gap-2 group/btn"
               onClick={() => onViewClick(product)}
           >
             <span>View & Buy</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
                  strokeLinecap="round" strokeLinejoin="round"
-                 className="group-hover/btn:translate-x-1 transition-transform">
+                 className="group-hover/btn:translate-x-1 transition-transform duration-200">
               <line x1="5" y1="12" x2="19" y2="12"/>
               <polyline points="12 5 19 12 12 19"/>
             </svg>

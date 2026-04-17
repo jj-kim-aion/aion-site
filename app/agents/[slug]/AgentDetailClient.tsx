@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useReveal } from "@/lib/useReveal";
-import type { Agent } from "@/lib/data";
+import {useReveal} from "@/lib/useReveal";
+import type {Agent} from "@/lib/data";
 
 const colorClasses: Record<string, { text: string; border: string; bg: string; glow: string }> = {
   "mirai-glow": {
@@ -66,10 +66,10 @@ export function AgentDetailClient({ agent }: { agent: Agent }) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {agent.stats.map((stat, i) => (
             <div key={i} className={`reveal reveal-delay-${i + 1}`}>
-              <p className={`text-display-sm font-light ${agent.gradientClass} mb-1`}>
+                <p className={`text-display-sm font-medium tabular-nums ${agent.gradientClass} mb-1`}>
                 {stat.value}
               </p>
-              <p className="font-mono text-caption text-ash">{stat.label}</p>
+                <p className="font-mono text-caption text-ash/70">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -117,7 +117,7 @@ export function AgentDetailClient({ agent }: { agent: Agent }) {
 
       {/* ── PHILOSOPHY ────────────────── */}
       <section className="py-section px-edge">
-        <div className={`relative overflow-hidden rounded-architectural border ${colors.border} bg-gradient-to-br from-graphite/80 to-carbon p-12 md:p-16`}>
+          <div className={`metal-card relative overflow-hidden rounded-2xl border ${colors.border} p-12 md:p-16`}>
           <div className={`absolute -top-20 -left-20 w-[300px] h-[300px] rounded-full ${colors.glow} blur-[100px] pointer-events-none`} />
 
           <div className="relative z-10 reveal">

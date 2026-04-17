@@ -84,7 +84,8 @@ export default function AboutPage() {
           <div className="flex flex-wrap gap-6 mt-12">
               <Link
                   href="/agents/mirai"
-                  className="group flex items-center gap-3 border border-mirai-glow/20 hover:border-mirai-glow/40 rounded-architectural px-6 py-3 transition-all duration-400 hover:glow-mirai"
+                  className="group flex items-center gap-3 border border-mirai-glow/25 hover:border-mirai-glow/50 rounded-full px-6 py-3 transition-all duration-300 hover:glow-mirai hover:bg-mirai-glow/[0.05]"
+                  style={{boxShadow: 'inset 0 1px 0 rgba(201,168,76,0.08)'}}
               >
               <div className="w-2 h-2 rounded-full bg-mirai-glow/60" />
               <span className="font-mono text-caption text-ash group-hover:text-mirai-glow transition-colors uppercase">
@@ -93,7 +94,8 @@ export default function AboutPage() {
             </Link>
               <Link
                   href="/agents/jj"
-                  className="group flex items-center gap-3 border border-jj-glow/20 hover:border-jj-glow/40 rounded-architectural px-6 py-3 transition-all duration-400 hover:glow-jj"
+                  className="group flex items-center gap-3 border border-jj-glow/25 hover:border-jj-glow/50 rounded-full px-6 py-3 transition-all duration-300 hover:glow-jj hover:bg-jj-glow/[0.05]"
+                  style={{boxShadow: 'inset 0 1px 0 rgba(126,200,227,0.08)'}}
               >
               <div className="w-2 h-2 rounded-full bg-jj-glow/60" />
               <span className="font-mono text-caption text-ash group-hover:text-jj-glow transition-colors uppercase">
@@ -102,7 +104,8 @@ export default function AboutPage() {
             </Link>
               <Link
                   href="/agents/chelsea"
-                  className="group flex items-center gap-3 border border-chelsea-glow/20 hover:border-chelsea-glow/40 rounded-architectural px-6 py-3 transition-all duration-400 hover:glow-chelsea"
+                  className="group flex items-center gap-3 border border-chelsea-glow/25 hover:border-chelsea-glow/50 rounded-full px-6 py-3 transition-all duration-300 hover:glow-chelsea hover:bg-chelsea-glow/[0.05]"
+                  style={{boxShadow: 'inset 0 1px 0 rgba(212,149,106,0.08)'}}
               >
               <div className="w-2 h-2 rounded-full bg-chelsea-glow/60" />
               <span className="font-mono text-caption text-ash group-hover:text-chelsea-glow transition-colors uppercase">
@@ -145,7 +148,7 @@ export default function AboutPage() {
 
       {/* ── MANIFESTO ─────────────────── */}
       <section className="py-section px-edge">
-        <div className="relative overflow-hidden rounded-architectural border border-white/[0.06] bg-gradient-to-br from-graphite/80 to-carbon p-12 md:p-20">
+          <div className="metal-card relative overflow-hidden rounded-2xl border border-white/[0.1] p-12 md:p-20">
           <div className="absolute -top-20 -right-20 w-[400px] h-[400px] rounded-full bg-mirai-glow/[0.03] blur-[120px] pointer-events-none" />
           <div className="absolute bottom-0 left-[20%] w-[300px] h-[300px] rounded-full bg-chelsea-glow/[0.02] blur-[100px] pointer-events-none" />
 

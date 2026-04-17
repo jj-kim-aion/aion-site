@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 interface EmailModalProps {
   isOpen: boolean;
@@ -98,7 +98,7 @@ export function EmailModal({
 
       {/* Modal */}
       <div
-        className="relative bg-void border border-white/[0.08] rounded-architectural p-8 md:p-10 max-w-md w-full shadow-2xl"
+          className="metal-card relative border border-white/[0.1] rounded-2xl p-8 md:p-10 max-w-md w-full"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}

@@ -29,12 +29,11 @@ export function AgentCard({ agent }: { agent: Agent }) {
   return (
       <Link href={`/agents/${agent.id}`} className="block group h-full">
       <div
-          className={`relative overflow-hidden rounded-architectural border bg-gradient-to-br from-graphite/80 to-carbon p-8 md:p-10 min-h-[460px] h-full flex flex-col transition-all duration-500 ${colorMap[agent.accentColor]} ${accentCssClass[agent.accentColor]}`}
-          style={{transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)"}}
+          className={`metal-card relative overflow-hidden rounded-2xl border p-8 md:p-10 min-h-[460px] h-full flex flex-col ${colorMap[agent.accentColor]} ${accentCssClass[agent.accentColor]}`}
       >
           {/* Ambient glow on hover */}
         <div
-            className={`absolute -top-20 -right-20 w-[240px] h-[240px] rounded-full ${bgGlow[agent.accentColor]} blur-[90px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`}
+            className={`absolute -top-20 -right-20 w-[280px] h-[280px] rounded-full ${bgGlow[agent.accentColor]} blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}
         />
 
         {/* Tagline */}
@@ -45,7 +44,7 @@ export function AgentCard({ agent }: { agent: Agent }) {
         </p>
 
         {/* Name */}
-          <h3 className="text-display-md font-light leading-none mb-1.5 tracking-tight">
+          <h3 className="text-display-md font-normal leading-none mb-1.5 tracking-tight">
               {agent.name}
         </h3>
 
@@ -60,15 +59,15 @@ export function AgentCard({ agent }: { agent: Agent }) {
         </p>
 
           {/* Stats strip */}
-          <div className="mt-8 pt-5 border-t border-white/[0.05] grid grid-cols-2 gap-4 mb-5">
+          <div className="mt-8 pt-5 border-t border-white/[0.08] grid grid-cols-2 gap-4 mb-5">
               {agent.stats.slice(0, 2).map((stat) => (
                   <div key={stat.label}>
                       <p
-                          className={`text-base font-light metric-value ${textColorMap[agent.accentColor]} mb-0.5`}
+                          className={`text-lg font-medium metric-value ${textColorMap[agent.accentColor]} mb-0.5 tabular-nums`}
                       >
                           {stat.value}
                       </p>
-                      <p className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-ash/45 leading-tight">
+                      <p className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-ash/50 leading-tight">
                           {stat.label}
                       </p>
                   </div>

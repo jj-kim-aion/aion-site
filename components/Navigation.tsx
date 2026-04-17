@@ -46,8 +46,8 @@ export function Navigation() {
                 {isActive(item.href) && <span className="nav-active-line"/>}
             </Link>
           ))}
-              <Link href="/store" className="btn-primary text-[0.65rem] py-2 px-5 ml-1">
-                  <span>Get Started</span>
+              <Link href="/store" className="btn-nav ml-1">
+                  Get Started
               </Link>
         </div>
 
@@ -96,9 +96,9 @@ export function Navigation() {
                   <Link
                       href="/store"
                       onClick={() => setIsOpen(false)}
-                      className="btn-primary text-[0.65rem] py-2.5 px-5 w-fit mt-2"
+                      className="btn-nav w-fit mt-2"
                   >
-                      <span>Get Started</span>
+                      Get Started
                   </Link>
               </div>
           </div>
