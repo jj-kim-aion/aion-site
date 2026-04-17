@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateAndConsumeToken } from "@/lib/tokens";
+import { validateAndConsumeToken } from "@/lib/orders";
 
 const BLOB_URL =
   "https://idvgrnhe5bv9ai1w.public.blob.vercel-storage.com/1-eBook-Building-Super-Agents.md.pdf";
@@ -26,18 +26,6 @@ export async function GET(request: NextRequest) {
 
     console.log(`🔍 Validating token: ${token.substring(0, 8)}...`);
 
-    // Check Redis connection availability
-    if (!process.env.REDIS_URL) {
-      console.error("❌ REDIS_URL environment variable not configured");
-      return NextResponse.json(
-        {
-          error: "Service configuration error",
-          message: "Token validation service is unavailable. Please contact support.",
-        },
-        { status: 500 }
-      );
-    }
-
     // Validate and consume token (one-time use)
     let tokenData;
     try {
@@ -45,15 +33,10 @@ export async function GET(request: NextRequest) {
     } catch (validationError) {
       console.error("❌ Token validation error:", validationError);
       
-      // User-friendly error based on error type
-      const errorMessage = validationError instanceof Error && validationError.message.includes("Redis")
-        ? "Token validation service is temporarily unavailable. Please try again in a moment."
-        : "Token validation failed. Please request a new download link.";
-      
       return NextResponse.json(
         {
           error: "Token validation failed",
-          message: errorMessage,
+          message: "Token validation service is temporarily unavailable. Please try again in a moment.",
         },
         { status: 500 }
       );
@@ -73,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     // Log successful download for analytics
     console.log(
-      `✅ Download authorized | Email: ${tokenData.email} | Product: ${tokenData.productId} | Token consumed: ${token.substring(0, 8)}...`
+        `✅ Download authorized | Email: ${tokenData.customer_email} | Product: ${tokenData.product_id} | Token consumed: ${token.substring(0, 8)}...`
     );
 
     // Fetch PDF from blob storage
@@ -116,7 +99,7 @@ export async function GET(request: NextRequest) {
     );
     headers.set("Content-Type", "application/pdf");
     headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
-    headers.set("X-Download-Email", tokenData.email); // For analytics
+    headers.set("X-Download-Email", tokenData.customer_email); // For analytics
 
     // Forward content-length if upstream provides it
     const contentLength = upstream.headers.get("content-length");

@@ -142,164 +142,26 @@ export const AGENTS: Agent[] = [
 
 // ── PRODUCTS ────────────────────────────
 
+import { supabase } from "./supabase";
+
 export type Product = {
-  id: string;
+  id: number; // BigInt ID from Supabase
+  product_id: string; // The string identifier (formerly id)
   name: string;
-  description: string;
-  longDescription: string;
+  product_summary: string;
+  detailed_description: string;
   price: number;
-  originalPrice?: number;
-  badge?: string;
+  original_price: number | null;
+  badge: string | null;
   category: "playbook" | "config" | "toolkit" | "bundle";
   features: string[];
   deliverables: string[];
   cta: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
-export const PRODUCTS: Product[] = [
-  {
-    id: "super-agent-playbook",
-    name: "The Super-Agent Playbook",
-    description:
-      "The complete system for deploying autonomous AI agents that run your business. Memory architecture, safety frameworks, multi-agent coordination, and revenue automation — from zero to fully operational in 3 weeks.",
-    longDescription:
-      "This isn't theory. It's the exact system we used to build Mirai, JJ, and Chelsea. Every configuration file, every cron job, every safety rule, every memory template — production-tested and ready to deploy. The playbook covers identity design, the three-layer memory architecture, the trust ladder, Mission Control setup, multi-agent team deployment, revenue tool integration, parallel coding patterns, and autonomous bug fixing. Over 15,000 words of implementation detail with copy-paste configs.",
-    price: 1,
-    badge: "Flagship",
-    category: "playbook",
-    features: [
-      "Complete 3-week deployment sprint plan",
-      "SOUL.md & IDENTITY.md templates",
-      "Three-layer memory architecture configs",
-      "Mission Control system (4 components)",
-      "Multi-agent team setup guide",
-      "Safety framework & trust ladder",
-      "Revenue tool integration playbook",
-      "Ralph Loop coding agent patterns",
-      "Sentry auto-fix pipeline setup",
-      "Cost optimization & model tiering",
-    ],
-    deliverables: [
-      "200+ page digital playbook (PDF + EPUB)",
-      "All configuration files (.json, .yaml, .md)",
-      "Mission Control templates (Notion-ready)",
-      "MEMORY.md, SOUL.md, IDENTITY.md starters",
-      "Cron job collection (12 production configs)",
-      "Webhook transform scripts",
-    ],
-    cta: "Get the Playbook",
-  },
-  {
-    id: "openclaw-starter-config",
-    name: "OpenClaw Starter Config",
-    description:
-      "Pre-built OpenClaw configuration for a single autonomous agent. Memory system, Telegram integration, nightly extraction, and safety rules — skip the setup and start operating.",
-    longDescription:
-      "Drop these files into your OpenClaw workspace and you have a working autonomous agent in under an hour. Includes a fully configured memory system with QMD semantic search, Telegram bot integration with approval queues, nightly memory extraction cron job, safety rules with email-as-untrusted-data enforcement, and a heartbeat monitor. Tested on Azure VPS and Mac Mini deployments.",
-    price: 79,
-    category: "config",
-    features: [
-      "Production-ready openclaw.json",
-      "QMD semantic search configuration",
-      "Telegram bot setup with approval queue",
-      "Nightly memory extraction cron",
-      "Heartbeat monitoring config",
-      "Safety rules & trust ladder defaults",
-    ],
-    deliverables: [
-      "openclaw.json (complete config)",
-      "SOUL.md template",
-      "IDENTITY.md template",
-      "MEMORY.md starter with 40+ entries",
-      "3 cron job definitions",
-      "Setup guide (INSTALL.md)",
-    ],
-    cta: "Get Starter Config",
-  },
-  {
-    id: "multi-agent-pro-config",
-    name: "Multi-Agent Pro Config",
-    description:
-      "Deploy a 4-agent team: COO, CTO, CMO, and Client Success. Includes agent-to-agent delegation, Telegram group architecture, model tiering, and Mission Control templates.",
-    longDescription:
-      "The full multi-agent configuration used in our production deployment. Each agent gets its own SOUL.md, IDENTITY.md, and workspace. Agent-to-agent communication is pre-configured. Telegram group topics are mapped to workstreams. Model tiering is enforced (Opus for strategy, Sonnet for execution, Haiku for monitoring). Includes Mission Control templates for task tracking, cost monitoring, session management, and human assignment queues.",
-    price: 149,
-    badge: "Popular",
-    category: "config",
-    features: [
-      "4 pre-configured agent identities",
-      "Agent-to-agent delegation setup",
-      "Telegram group topic architecture",
-      "Model tiering enforcement rules",
-      "Mission Control full template set",
-      "Cost tracker with daily Telegram reports",
-      "Session monitor with heartbeat config",
-      "Human Assignment Queue templates",
-    ],
-    deliverables: [
-      "4x agent config files",
-      "4x SOUL.md files (COO, CTO, CMO, CS)",
-      "Telegram group setup guide",
-      "Mission Control Notion template pack",
-      "8 cron job definitions",
-      "Cost optimization reference sheet",
-    ],
-    cta: "Get Pro Config",
-  },
-  {
-    id: "sentry-pipeline-kit",
-    name: "Sentry Auto-Fix Pipeline",
-    description:
-      "Turn your AI into a 24/7 bug-fixing machine. Sentry webhook → triage → auto-fix → PR — while you sleep. Includes the complete pipeline with transform scripts and decision rules.",
-    longDescription:
-      "The autonomous bug fixing pipeline that takes your AI from reactive to proactive. Errors are detected by Sentry, posted to Slack, triaged by your agent (auto-fix vs. escalate), fixed in an isolated git worktree via Codex, validated against the full test suite, and submitted as a PR — typically in under 5 minutes. Includes the webhook transform script, triage decision rules, git worktree setup, Ralph Loop integration, and Sentry API resolution calls.",
-    price: 99,
-    category: "toolkit",
-    features: [
-      "Sentry → Slack → OpenClaw webhook pipeline",
-      "Auto-fix vs. escalate decision rules",
-      "Git worktree isolation pattern",
-      "Ralph Loop Codex integration",
-      "Test-driven fix enforcement",
-      "Sentry auto-resolution on merge",
-    ],
-    deliverables: [
-      "Webhook transform script (JS)",
-      "Slack channel configuration",
-      "Triage rules template (MD)",
-      "3 Ralph Loop PRD templates",
-      "Session monitor integration",
-      "Pipeline setup guide",
-    ],
-    cta: "Get the Pipeline",
-  },
-  {
-    id: "full-deployment-bundle",
-    name: "Full Deployment Bundle",
-    description:
-      "Everything. The Playbook + Multi-Agent Pro Config + Sentry Pipeline + all future updates. The complete Aion Labs system in one package.",
-    longDescription:
-      "For operators who want the entire system, not pieces of it. This bundle includes every product we sell plus lifetime access to updates as we refine our deployment. You get the Super-Agent Playbook, the Multi-Agent Pro Config, the Sentry Auto-Fix Pipeline, and any new toolkits or configs we release in the next 12 months. This is the same system running our business right now.",
-    price: 349,
-    originalPrice: 447,
-    badge: "Best Value",
-    category: "bundle",
-    features: [
-      "Everything in the Super-Agent Playbook",
-      "Everything in Multi-Agent Pro Config",
-      "Everything in Sentry Pipeline Kit",
-      "12 months of free updates",
-      "Priority access to new releases",
-      "Discord community access",
-    ],
-    deliverables: [
-      "All deliverables from all products",
-      "Bundle-exclusive quick-start guide",
-      "Priority email support (48hr SLA)",
-    ],
-    cta: "Get the Full Bundle",
-  },
-];
+export const PRODUCTS: Product[] = [];
 
 // ── NAVIGATION ──────────────────────────
 
@@ -412,3 +274,48 @@ This isn't theoretical. It's production.`,
     ],
   },
 };
+
+/**
+ * Fetches products from Supabase
+ */
+export async function getProducts(): Promise<Product[]> {
+  try {
+    console.log("getProducts: Initiating Supabase fetch...");
+    const {data, error} = await supabase
+        .from("products")
+        .select("*")
+        .order("id", {ascending: true}); // Order by internal ID to maintain sequence
+
+    if (error) {
+      console.error("getProducts: Supabase error:", error);
+      return []; // Fallback to empty array
+    }
+
+    console.log(`getProducts: Fetched ${data?.length || 0} products from Supabase.`);
+    if (data && data.length > 0) {
+      console.log("getProducts: First product ID:", data[0].product_id);
+    }
+    return data as Product[];
+  } catch (err) {
+    console.error("getProducts: Unexpected error:", err);
+    return [];
+  }
+}
+
+/**
+ * Fetches a single product by numeric internal ID from Supabase
+ */
+export async function getProductByInternalId(id: number): Promise<Product | null> {
+  const {data, error} = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+  if (error) {
+    console.error(`Error fetching product with internal ID ${id} from Supabase:`, error);
+    return null; // Fallback
+  }
+
+  return data as Product;
+}

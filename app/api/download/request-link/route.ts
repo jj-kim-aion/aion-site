@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { createToken } from "@/lib/tokens";
+import { createDownloadToken } from "@/lib/orders";
 import { getDownloadEmailHTML, getDownloadEmailText } from "@/lib/email-template";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -47,31 +47,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check Redis connection availability
-    if (!process.env.REDIS_URL) {
-      console.error("❌ REDIS_URL environment variable not configured");
-      return NextResponse.json(
-        { error: "Service configuration error. Please contact support." },
-        { status: 500 }
-      );
-    }
-
-    // Generate secure token with Redis
+    // Generate secure token in Supabase
     let token: string;
     try {
       console.log(`📝 Creating token for ${email}...`);
-      token = await createToken(email, productId);
+      // For manual requests, we don't have an order ID, so we use "MANUAL"
+      const tokenData = await createDownloadToken("MANUAL", email, productId);
+      token = tokenData.token;
       console.log(`✅ Token created successfully: ${token.substring(0, 8)}...`);
     } catch (tokenError) {
       console.error("❌ Token creation failed:", tokenError);
       
-      // User-friendly error message
-      const errorMessage = tokenError instanceof Error && tokenError.message.includes("REDIS_URL")
-        ? "Token service is not configured. Please contact support."
-        : "Failed to generate download link. Please try again in a moment.";
-      
       return NextResponse.json(
-        { error: errorMessage },
+          {error: "Failed to generate download link. Please try again in a moment."},
         { status: 500 }
       );
     }
@@ -92,8 +80,8 @@ export async function POST(request: NextRequest) {
         to: [email],
         replyTo: "research@aionlabs.io",
         subject: "Your Aion Super Agents Playbook Download",
-        html: getDownloadEmailHTML(productName, downloadUrl, email),
-        text: getDownloadEmailText(productName, downloadUrl, email),
+        html: getDownloadEmailHTML(productName, downloadUrl, email, "MANUAL"),
+        text: getDownloadEmailText(productName, downloadUrl, email, "MANUAL"),
       });
 
       if (error) {

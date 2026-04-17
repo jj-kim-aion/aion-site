@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-import { PRODUCTS } from "@/lib/data";
+import { getProductByInternalId } from "@/lib/data";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,9 +13,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const product = PRODUCTS.find((p) => p.id === productId);
+    // productId from EmailModal is selectedProduct.id (number)
+    const product = await getProductByInternalId(Number(productId));
 
     if (!product) {
+      console.error(`Checkout API: Product with internal ID ${productId} not found.`);
       return NextResponse.json(
         { error: "Product not found" },
         { status: 404 }
@@ -35,20 +37,21 @@ export async function POST(request: NextRequest) {
             currency: "usd",
             product_data: {
               name: product.name,
-              description: product.description,
+              description: product.product_summary,
             },
-            unit_amount: product.price * 100, // Stripe expects amounts in cents
+            unit_amount: Math.round(product.price * 100), // Stripe expects amounts in cents
           },
           quantity: 1,
         },
       ],
       mode: "payment",
       customer_email: email,
-      success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${baseUrl}/checkout/success?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/store?canceled=true`,
       metadata: {
         email,
-        productId,
+        productId: product.product_id, // String identifier for metadata
+        internalId: product.id.toString(), // Numeric internal ID
       },
     });
 
